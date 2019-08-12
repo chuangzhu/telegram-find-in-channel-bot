@@ -1,44 +1,46 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telethon import TelegramClient, events
+from telethon.tl import types, functions
+import os
+import configparser
 import logging
-import sys
-
-token = sys.argv[1]
-
-updater = Updater(token=token, use_context=True)
-dispatcher = updater.dispatcher
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO)
 
+config = configparser.ConfigParser()
+config.read(os.path.expanduser('~/.config/tgficbot.cfg'))
 
-def start(update, context):
-    context.bot.send_message(chat_id=update.message.chat_id, text='Hello!')
-
-
-start_handler = CommandHandler('start', start)
-dispatcher.add_handler(start_handler)
-
-
-def text(update, context):
-    if update.channel_post is not None:
-        context.bot.send_message(chat_id=update.channel_post.chat_id,
-                                 text=update.channel_post.text)
-    else:
-        context.bot.send_message(chat_id=update.message.chat_id,
-                                 text=update.message.text)
+bot = TelegramClient(
+    'bot', config['api']['id'],
+    config['api']['hash']).start(bot_token=config['bot']['token'])
 
 
-text_handler = MessageHandler(Filters.text, text)
-dispatcher.add_handler(text_handler)
+@bot.on(events.NewMessage(pattern='/start'))
+async def start(event):
+    await event.respond('Hi!')
+    raise events.StopPropagation
 
 
-def unknown_command(update, context):
-    context.bot.send_message(chat_id=update.message.chat_id,
-                             text="Sorry, I didn't understand that command.")
+@bot.on(events.NewMessage(pattern='/find'))
+async def find(event):
+    args = event.raw_text.split()
+    chat = await event.get_chat()
+    if isinstance(chat, types.User):
+        for text in args[1:]:
+            await event.respond(text)
+    elif isinstance(chat, types.Channel):
+        for text in args[2:]:
+            await event.respond(text)
 
 
-unknown_command_handler = MessageHandler(Filters.command, unknown_command)
-dispatcher.add_handler(unknown_command_handler)
+@bot.on(events.NewMessage(pattern='/get'))
+async def get_history(event):
+    channel = await bot.get_input_entity('genelocated')
+    full_channel = await bot(functions.channels.GetFullChannelRequest(channel=channel))
+    for i in range(full_channel.full_chat.read_inbox_max_id):
+        message = await bot.get_messages(channel, ids=i)
+        print(message)
 
-updater.start_polling()
+
+bot.run_until_disconnected()
