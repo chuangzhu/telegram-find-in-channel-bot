@@ -1,6 +1,7 @@
 import sqlite3
 import os
 from telethon.tl import types
+from tgficbot import states
 
 dbpath = os.path.expanduser('~/.cache/tgficbot.db')
 
@@ -26,6 +27,7 @@ cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         user_id INTEGER PRIMARY KEY,
         username TEXT,
+        state INTEGER NOT NULL,
         selected_id INTEGER
     );
 """)
@@ -40,8 +42,24 @@ cursor.execute("""
 
 def save_user(user: types.User):
     cursor.execute(
-        'INSERT OR REPLACE INTO users (user_id, username) VALUES (?, ?)',
-        (user.id, user.username))
+        'INSERT OR REPLACE INTO users (user_id, username, state) VALUES (?, ?, ?)',
+        (user.id, user.username, states.Empty))
+
+
+def get_user_state(user: types.User):
+    cursor.execute('SELECT state FROM users WHERE user_id = ?', (user.id, ))
+    fetched = cursor.fetchone()
+    return None if fetched is None else states.State(fetched[0])
+
+
+def set_user_state(user: types.User, state: states.State):
+    cursor.execute('UPDATE users SET state = ? WHERE user_id = ?',
+                   (state.numerator, user.id))
+    conn.commit()
+
+
+def clear_user_state(user: types.User):
+    set_user_state(user, state=states.Empty)
 
 
 def check_channel_saved(full_channel: types.ChannelFull):
@@ -66,6 +84,23 @@ def save_channel_admin_relation(channel_id: int, admin: types.User):
     cursor.execute(
         'INSERT INTO channels_admins (channel_id, user_id) VALUES (?, ?)',
         (channel_id, admin.id))
+
+
+def get_user_owned_channel(user: types.User):
+    cursor.execute('SELECT channel_id FROM channels_admins WHERE user_id = ?',
+                   (user.id, ))
+    sqlresult = cursor.fetchall()
+
+    def sqlresult2id(result):
+        return result[0]
+
+    return map(sqlresult2id, sqlresult)
+
+
+def get_channel_title(channel_id: int):
+    cursor.execute('SELECT title FROM channels WHERE channel_id = ?',
+                   (channel_id, ))
+    return cursor.fetchone()[0]
 
 
 def save_message(message: types.Message):
@@ -95,12 +130,13 @@ def find_in_messages(channel_id: int, pattern: str):
     return message_ids
 
 
-def save_selected(user_id: int, channel_id: int):
+def set_user_selected(user_id: int, channel_id: int):
     cursor.execute('UPDATE users SET selected_id=? WHERE user_id=?',
                    (channel_id, user_id))
+    conn.commit()
 
 
-def get_selected(user_id: int):
+def get_user_selected(user_id: int):
     cursor.execute('SELECT selected_id FROM users WHERE user_id=?',
                    (user_id, ))
     return cursor.fetchone()[0]
