@@ -1,7 +1,6 @@
 import sqlite3
 import os
 from telethon.tl import types
-from tgficbot import userstates
 
 dbpath = os.path.expanduser('~/.cache/tgficbot.db')
 
@@ -27,7 +26,6 @@ cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         user_id INTEGER PRIMARY KEY,
         username TEXT,
-        state INTEGER NOT NULL,
         selected_id INTEGER
     );
 """)
@@ -42,19 +40,8 @@ cursor.execute("""
 
 def save_user(user: types.User):
     cursor.execute(
-        'INSERT OR REPLACE INTO users (user_id, username, state) VALUES (?, ?, ?)',
-        (user.id, user.username, userstates.Empty))
-
-
-def save_user_state(user: types.User, state):
-    cursor.execute(
-        'INSERT OR REPLACE INTO users (user_id, state) VALUES (?, ?)',
-        (user.id, state))
-
-
-def get_user_state(user: types.User):
-    cursor.execute('SELECT state FROM users WHERE user_id = ?', (user.id, ))
-    return cursor.fetchone()[0]
+        'INSERT OR REPLACE INTO users (user_id, username) VALUES (?, ?)',
+        (user.id, user.username))
 
 
 def check_channel_saved(full_channel: types.ChannelFull):

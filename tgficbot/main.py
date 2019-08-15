@@ -1,10 +1,10 @@
 from telethon import TelegramClient
-from telethon.events import NewMessage, StopPropagation
+from telethon.events import NewMessage, StopPropagation, register, unregister
 from telethon.tl import types, functions
 import os
 import configparser
 import logging
-from tgficbot import db, userstates
+from tgficbot import db
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -52,21 +52,30 @@ async def init_channel(event):
 1. Add this bot to your channel as an admin;
 2. Forward any message of the channel to me.''')
     user = await event.get_chat()
-    db.save_user_state(user, userstates.AddingAChannel)
+    Initializer(user)
 
 
-@bot.on(NewMessage())
-async def new_message(event: NewMessage.Event):
-    if event.is_channel:
-        db.save_message(event.message)
-        return
-    if event.is_private:
-        user = await event.get_chat()
-        if db.get_user_state(user) == userstates.AddingAChannel:
-            if event.message.fwd_from == None:
-                await event.respond('Please forward any message from your channel to me, or use `/cancel` to quit.')
+class Initializer:
+    """We need to add a event handler to bot, and remove it after it finished.
+    To make it easier, let's pack it into a class.
+    """
+
+    def __init__(self, user: types.User):
+        self.user = user
+        self.handler = self.new_handler(user)
+        bot.add_event_handler(self.handler)
+
+    def new_handler(self, user: types.User):
+        async def on_forward_func(event):
+            if event.message.message == '/cancel':
+                await event.respond('Aborted.')
+                self.remove_handler()
                 return
-
+            if event.message.fwd_from is None:
+                await event.respond(
+                    'Please forward any message from your channel to me, or /cancel to abort.'
+                )
+                return
             if event.message.fwd_from.channel_id is None:
                 await event.respond('Please forward from a channel.')
                 return
@@ -78,7 +87,7 @@ async def new_message(event: NewMessage.Event):
                 functions.channels.GetFullChannelRequest(channel=channel))
             if db.check_channel_saved(full_channel):
                 await event.respond('Channel already initialized. Abort.')
-                db.save_user_state(user, userstates.Empty)  # Clear state
+                self.remove_handler()
                 return
             db.save_channel(full_channel)
 
@@ -93,13 +102,25 @@ async def new_message(event: NewMessage.Event):
 
             db.conn.commit()
             await event.respond('Initialize finished.')
-            db.save_user_state(user, userstates.Empty)  # Clear state
+            self.remove_handler()
+
+        # Register the handler
+        return register(event=NewMessage(from_users=user))(on_forward_func)
+
+    def remove_handler(self):
+        unregister(self.handler)
+        bot.remove_event_handler(self.handler)
+
+
+@bot.on(NewMessage())
+async def new_message(event: NewMessage.Event):
+    if event.is_channel:
+        db.save_message(event.message)
 
 
 # @bot.on(NewMessage())
 # async def peek_message(event: NewMessage.Event):
 #     print(event.message)
-
 
 # @bot.on(NewMessage(pattern='/select'))
 # async def select_channel(event: NewMessage.Event):
@@ -109,6 +130,5 @@ async def new_message(event: NewMessage.Event):
 
 #     chat = await event.get_chat()
 #     db.save_selected(chat.id, )
-
 
 bot.run_until_disconnected()

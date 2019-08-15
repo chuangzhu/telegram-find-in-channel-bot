@@ -1,2 +1,0 @@
-Empty = 0x0
-AddingAChannel = 0x1
