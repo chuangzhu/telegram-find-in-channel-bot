@@ -22,9 +22,9 @@ bot = TelegramClient(
 
 
 @bot.on(NewMessage(pattern='/start'))
-async def start(event: NewMessage.Event):
+async def start_command_handler(event: NewMessage.Event):
     if event.is_private:
-        await event.respond('Hi!')
+        await event.respond(strings.greeting)
         chat = await event.get_chat()
         db.save_user(chat)
         db.conn.commit()
@@ -33,7 +33,7 @@ async def start(event: NewMessage.Event):
 
 @bot.on(NewMessage(pattern='/add'))
 @onstate(states.Empty)
-async def init_channel(event):
+async def add_command_handler(event):
     await event.respond(strings.add_guide)
     user = await event.get_chat()
     db.set_user_state(user, states.AddingAChannel)
@@ -41,7 +41,7 @@ async def init_channel(event):
 
 @bot.on(NewMessage())
 @onstate(states.AddingAChannel)
-async def on_initializing_forward(event: NewMessage.Event):
+async def adding_forward_handler(event: NewMessage.Event):
     user = await event.get_chat()
 
     if event.message.message == '/cancel':
@@ -81,13 +81,13 @@ async def on_initializing_forward(event: NewMessage.Event):
 
 @bot.on(NewMessage(pattern='/find'))
 @onstate(states.Empty)
-async def select_channel(event: NewMessage.Event):
+async def find_command_handler(event: NewMessage.Event):
     if not event.is_private:
         await event.respond(strings.private_only)
         return
 
     user = await event.get_chat()
-    user_owned_channel_ids = db.get_user_owned_channel(user)
+    user_owned_channel_ids = db.get_user_owned_channels(user)
 
     def channel_id2button(channel_id):
         channel_title = db.get_channel_title(channel_id)
@@ -95,14 +95,20 @@ async def select_channel(event: NewMessage.Event):
 
     buttons = list(map(channel_id2button, user_owned_channel_ids))
     await event.respond(strings.find_select, buttons=buttons)
-    db.set_user_state(user, states.SelectingAChannel)
+    db.set_user_state(user, states.SelectingAChannelToFind)
 
 
 @bot.on(CallbackQuery())
-@onstate(states.SelectingAChannel)
-async def callback_query(event: CallbackQuery.Event):
+@onstate(states.SelectingAChannelToFind)
+async def select_channel_to_find_handler(event: CallbackQuery.Event):
     user = await event.get_chat()
     channel_id = int(event.data)
+
+    if user.id not in db.get_channel_admins(channel_id):
+        await event.respond(strings.find_access_failed)
+        db.clear_user_state(user)
+        return
+
     channel_title = db.get_channel_title(channel_id)
     db.set_user_state(user, states.FindingInAChannel)
     db.set_user_selected(user.id, channel_id)
@@ -111,7 +117,7 @@ async def callback_query(event: CallbackQuery.Event):
 
 @bot.on(NewMessage())
 @onstate(states.FindingInAChannel)
-async def find_in_a_channel(event: NewMessage.Event):
+async def finding_handler(event: NewMessage.Event):
     user = await event.get_chat()
     channel_id = db.get_user_selected(user.id)
     pattern = event.raw_text
@@ -131,7 +137,7 @@ async def find_in_a_channel(event: NewMessage.Event):
 
 
 @bot.on(NewMessage())
-async def new_message(event: NewMessage.Event):
+async def channel_newmessage_handler(event: NewMessage.Event):
     if event.is_channel:
         db.save_message(event.message)
 

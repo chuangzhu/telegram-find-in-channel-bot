@@ -86,15 +86,23 @@ def save_channel_admin_relation(channel_id: int, admin: types.User):
         (channel_id, admin.id))
 
 
-def get_user_owned_channel(user: types.User):
+def _sqlresult2id(result):
+    return result[0]
+
+
+def get_user_owned_channels(user: types.User):
     cursor.execute('SELECT channel_id FROM channels_admins WHERE user_id = ?',
                    (user.id, ))
     sqlresult = cursor.fetchall()
 
-    def sqlresult2id(result):
-        return result[0]
+    return map(_sqlresult2id, sqlresult)
 
-    return map(sqlresult2id, sqlresult)
+
+def get_channel_admins(channel_id: types.Channel):
+    cursor.execute('SELECT user_id FROM channels_admins WHERE channel_id = ?',
+                   (channel_id, ))
+    sqlresult = cursor.fetchall()
+    return map(_sqlresult2id, sqlresult)
 
 
 def get_channel_title(channel_id: int):

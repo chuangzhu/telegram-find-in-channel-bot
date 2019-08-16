@@ -1,3 +1,6 @@
+greeting = '''你好！请先使用 /add 命令将你的频道添加至这个机器人，然后就可以使用 /find 进行搜索啦。
+Hi! To /find in your channel, you must /add it to this bot first.'''
+
 add_guide = '''要添加你的频道，请：
 
 1. 将这个机器人作为管理员添加至你的频道；
@@ -27,6 +30,9 @@ private_only = '该命令只能在与机器人私聊时使用。 This command ca
 
 find_select = '''选择一个频道：
 Select a channel to search:'''
+
+find_access_failed = '''很抱歉，你没有权限访问此频道。
+Sorry, you don't have the permission to access this channel.'''
 
 find_lets_find = '''请输入你要搜索的内容，或使用 /quit 退出。
 Now type in what you want to find in **{}**, or /quit to quit.'''
