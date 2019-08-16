@@ -27,7 +27,7 @@ python3 setup.py install
 ```sh
 apt update
 apt install clang python3-dev
-pip install -U --user cryptg
+pip3 install -U --user cryptg
 ```
 
 配置文件位置在 `~/.config/tgficbot.cfg`，格式如下：
@@ -68,7 +68,7 @@ python3 setup.py install
 ```sh
 apt update
 apt install clang python3-dev
-pip install -U --user cryptg
+pip3 install -U --user cryptg
 ```
 
 Configuration file is `~/.config/tgficbot.cfg`, here's the format:
