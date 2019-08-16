@@ -1,10 +1,75 @@
 # [@FindInChannelBot](https://telegram.me/FindInChannelBot)
 
-Telegram 的消息搜索功能不支持中日韩等语言，因为这类语言字词间不加空格。而我习惯于使用 Telegram 的频道做笔记，因此一个好用的搜索功能对我来说很重要。
+Telegram 的消息搜索功能不支持中日韩等语言，因为这类语言字词间不加空格。而我习惯于使用 Telegram 的频道做笔记，因此一个好用的搜索功能对我来说很重要。为了能方便地在频道内搜索，这个机器人诞生了。
 
-The ‘Find in Conversations’ feature in Telegram does not support searching in Chinese/Japanese/Korean etc., since these languages do not have spaces between words.
+The ‘Find in Conversations’ feature in Telegram does not support searching in Chinese/Japanese/Korean etc., since these languages do not have spaces between words. I'm used to take note in Telegram channels, so it's important for me to have a better search tool. So I made this bot so I can find in channels easily.
 
-这个机器人仅可用于搜索**频道**内容，搜索群组聊天记录请使用 [Taosky 的聊天记录复读机](https://github.com/Taosky/telegram-search-bot)。
+## Usage
 
-This bot can only be used to **find in channel**, in case you would like to search in group conversations, use [Taosky's message repeater](https://github.com/Taosky/telegram-search-bot).
+`/start` `/init` `/find`
 
+## 部署
+
+这个机器人使用的并不是 HTTP bot API，而是 MTProto 客户端 API。请先获取这两样东西：
+
+* App `api_id` 和 `api_hash`，请在 https://my.telegram.org/apps 获取；
+* Bot token，请与 [@BotFather](https://t.me/BotFather) 聊天获取。
+
+克隆这个仓库，然后安装：  
+
+```sh
+cd telegram-find-in-channel-bot
+python setup.py install
+```
+
+配置文件位置在 `~/.config/tgficbot.cfg`，格式如下：
+
+```ini
+[api]
+id = 123456
+hash = xxxxxxxxxxxxxxxxx
+
+[bot]
+token = 123456789:xxxxxxxxxxxxxxxxxxxx
+```
+
+准备好配置文件后，就可以启动了：
+
+```sh
+python -m tgficbot.main
+```
+
+运行时的数据库将被放在 `~/.cache/tgficbot.db`。
+
+## Deploy
+
+Instead of HTTP bot API, this bot uses MTProto client API. Please obtain these tokens:
+
+* App `api_id` and `api_hash`, please obtain it at https://my.telegram.org/apps;
+* Bot token, please obtain it by talking to [@BotFather](https://t.me/BotFather).
+
+Clone this repo and install:
+
+```sh
+cd telegram-find-in-channel-bot
+python setup.py install
+```
+
+Configuration file is `~/.config/tgficbot.cfg`, here's the format:
+
+```ini
+[api]
+id = 123456
+hash = xxxxxxxxxxxxxxxxx
+
+[bot]
+token = 123456789:xxxxxxxxxxxxxxxxxxxx
+```
+
+To run:
+
+```sh
+python -m tgficbot.main
+```
+
+The database will be placed at `~/.cahce/tgficbot`.

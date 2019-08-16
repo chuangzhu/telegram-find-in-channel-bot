@@ -83,22 +83,6 @@ async def on_initializing_forward(event: NewMessage.Event):
     db.clear_user_state(user)
 
 
-# @bot.on(NewMessage(pattern='/find'))
-# async def find(event):
-#     args = event.raw_text.split()
-#     if len(args) == 1:
-#         await event.respond('Usage: `/find channel_name pattern`')
-#         return
-
-#     channel_name = args[1]
-#     pattern = ' '.join(args[2:])
-#     if event.is_private:
-#         channel = await bot.get_input_entity(channel_name)
-#         found_message_ids = db.find_in_messages(channel.channel_id, pattern)
-#         for message_id in found_message_ids:
-#             await event.respond(f'https://t.me/{channel_name}/{message_id}')
-
-
 @bot.on(NewMessage(pattern='/find'))
 @onstate(states.Empty)
 async def select_channel(event: NewMessage.Event):
