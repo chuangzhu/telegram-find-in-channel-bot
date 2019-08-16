@@ -1,5 +1,5 @@
 from telethon import TelegramClient
-from telethon.events import NewMessage, CallbackQuery, StopPropagation, register, unregister
+from telethon.events import NewMessage, CallbackQuery, StopPropagation
 from telethon.tl import types, functions
 from telethon.tl.custom import Button
 import os
@@ -7,6 +7,7 @@ import configparser
 import logging
 from tgficbot import db, states
 from tgficbot.states import onstate
+from tgficbot import strings
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -30,13 +31,10 @@ async def start(event: NewMessage.Event):
         raise StopPropagation
 
 
-@bot.on(NewMessage(pattern='/init'))
+@bot.on(NewMessage(pattern='/add'))
 @onstate(states.Empty)
 async def init_channel(event):
-    await event.respond('''To initialize your channel, do the following:
-
-1. Add this bot to your channel as an admin;
-2. Forward any message of the channel to me.''')
+    await event.respond(strings.add_guide)
     user = await event.get_chat()
     db.set_user_state(user, states.AddingAChannel)
 
@@ -47,24 +45,22 @@ async def on_initializing_forward(event: NewMessage.Event):
     user = await event.get_chat()
 
     if event.message.message == '/cancel':
-        await event.respond('Aborted.')
+        await event.respond(strings.add_aborted)
         db.clear_user_state(user)
         return
     if event.message.fwd_from is None:
-        await event.respond(
-            'Please forward any message from your channel to me, or /cancel to abort.'
-        )
+        await event.respond(strings.add_not_forward)
         return
     if event.message.fwd_from.channel_id is None:
-        await event.respond('Please forward from a channel.')
+        await event.respond(strings.add_forward_not_channel)
         return
 
-    await event.respond('Getting channel infos...')
+    await event.respond(strings.add_getting_infos)
     channel = await bot.get_input_entity(event.message.fwd_from.channel_id)
     full_channel = await bot(
         functions.channels.GetFullChannelRequest(channel=channel))
     if db.check_channel_saved(full_channel):
-        await event.respond('Channel already initialized. Abort.')
+        await event.respond(strings.add_already_added)
         db.clear_user_state(user)
         return
     db.save_channel(full_channel)
@@ -73,13 +69,13 @@ async def on_initializing_forward(event: NewMessage.Event):
             channel, filter=types.ChannelParticipantsAdmins):
         db.save_channel_admin_relation(channel.channel_id, admin)
 
-    await event.respond('Obtaining previous messages...')
+    await event.respond(strings.add_obtain_msg)
     for i in range(full_channel.full_chat.read_inbox_max_id):
         message = await bot.get_messages(channel, ids=i)
         db.save_message(message)
 
     db.conn.commit()
-    await event.respond('Initialize finished.')
+    await event.respond(strings.add_finished)
     db.clear_user_state(user)
 
 
@@ -87,7 +83,7 @@ async def on_initializing_forward(event: NewMessage.Event):
 @onstate(states.Empty)
 async def select_channel(event: NewMessage.Event):
     if not event.is_private:
-        await event.respond('This command can only be used in private chat.')
+        await event.respond(strings.private_only)
         return
 
     user = await event.get_chat()
@@ -98,7 +94,7 @@ async def select_channel(event: NewMessage.Event):
         return Button.inline(channel_title, data=channel_id)
 
     buttons = list(map(channel_id2button, user_owned_channel_ids))
-    await event.respond('Select a channel to search:', buttons=buttons)
+    await event.respond(strings.find_select, buttons=buttons)
     db.set_user_state(user, states.SelectingAChannel)
 
 
@@ -110,9 +106,7 @@ async def callback_query(event: CallbackQuery.Event):
     channel_title = db.get_channel_title(channel_id)
     db.set_user_state(user, states.FindingInAChannel)
     db.set_user_selected(user.id, channel_id)
-    await event.respond(
-        'Now type in what you want to find in **{}**, or /quit to quit.'.
-        format(channel_title))
+    await event.respond(strings.find_lets_find.format(channel_title))
 
 
 @bot.on(NewMessage())
@@ -125,12 +119,12 @@ async def find_in_a_channel(event: NewMessage.Event):
     if pattern == '/quit':
         db.set_user_state(user, states.Empty)
         db.set_user_selected(user.id, None)
-        await event.respond('Quitted searching.')
+        await event.respond(strings.find_quit)
         return
 
     found_message_ids = db.find_in_messages(channel_id, pattern)
     if len(found_message_ids) == 0:
-        await event.respond('No results.')
+        await event.respond(strings.find_no_result)
         return
     for message_id in found_message_ids:
         await bot.forward_messages(user, message_id, channel_id)

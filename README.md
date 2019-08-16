@@ -6,7 +6,7 @@ The ‘Find in Conversations’ feature in Telegram does not support searching i
 
 ## Usage
 
-`/start` `/init` `/find`
+`/start` `/add` `/find`
 
 ## 部署
 
