@@ -19,7 +19,15 @@ The ‘Find in Conversations’ feature in Telegram does not support searching i
 
 ```sh
 cd telegram-find-in-channel-bot
-python setup.py install
+python3 setup.py install
+```
+
+（可选）安装 `cryptg` 可提速：
+
+```sh
+apt update
+apt install clang python3-dev
+pip install -U --user cryptg
 ```
 
 配置文件位置在 `~/.config/tgficbot.cfg`，格式如下：
@@ -36,7 +44,7 @@ token = 123456789:xxxxxxxxxxxxxxxxxxxx
 准备好配置文件后，就可以启动了：
 
 ```sh
-python -m tgficbot.main
+python3 -m tgficbot.main
 ```
 
 运行时的数据库将被放在 `~/.cache/tgficbot.db`。
@@ -52,7 +60,15 @@ Clone this repo and install:
 
 ```sh
 cd telegram-find-in-channel-bot
-python setup.py install
+python3 setup.py install
+```
+
+(Optional) If `cryptg` is installed, the bot will work faster:
+
+```sh
+apt update
+apt install clang python3-dev
+pip install -U --user cryptg
 ```
 
 Configuration file is `~/.config/tgficbot.cfg`, here's the format:
@@ -69,7 +85,7 @@ token = 123456789:xxxxxxxxxxxxxxxxxxxx
 To run:
 
 ```sh
-python -m tgficbot.main
+python3 -m tgficbot.main
 ```
 
 The database will be placed at `~/.cahce/tgficbot`.
