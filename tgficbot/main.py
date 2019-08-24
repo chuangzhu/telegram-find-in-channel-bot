@@ -39,15 +39,22 @@ async def add_command_handler(event):
     db.set_user_state(user, states.AddingAChannel)
 
 
+@bot.on(NewMessage(pattern='/cancel'))
+async def cancel_command_handler(event: NewMessage.Event):
+    user = await event.get_chat()
+    current_state = db.get_user_state(user)
+    if current_state == states.Empty:
+        return
+    db.clear_user_state(user)
+    db.set_user_selected(user.id, None)
+    await event.respond(strings.cancel)
+
+
 @bot.on(NewMessage())
 @onstate(states.AddingAChannel)
 async def adding_forward_handler(event: NewMessage.Event):
     user = await event.get_chat()
 
-    if event.message.message == '/cancel':
-        await event.respond(strings.add_aborted)
-        db.clear_user_state(user)
-        return
     if event.message.fwd_from is None:
         await event.respond(strings.add_not_forward)
         return
@@ -121,12 +128,6 @@ async def finding_handler(event: NewMessage.Event):
     user = await event.get_chat()
     channel_id = db.get_user_selected(user.id)
     pattern = event.raw_text
-
-    if pattern == '/quit':
-        db.set_user_state(user, states.Empty)
-        db.set_user_selected(user.id, None)
-        await event.respond(strings.find_quit)
-        return
 
     found_message_ids = db.find_in_messages(channel_id, pattern)
     if len(found_message_ids) == 0:

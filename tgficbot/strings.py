@@ -11,7 +11,7 @@ To add your channel, do the following:
 1. Add this bot to your channel as an admin;
 2. Forward a message from the channel to me.'''
 
-add_aborted = '已取消。 Aborted.'
+cancel = '已取消。 Aborted.'
 
 add_not_forward = '''请将你的频道中任意一条消息转发给我，或使用 /cancel 来取消。
 Please forward any message from your channel to me, or /cancel to abort.'''
@@ -34,9 +34,7 @@ Select a channel to search:'''
 find_access_failed = '''很抱歉，你没有权限访问此频道。
 Sorry, you don't have the permission to access this channel.'''
 
-find_lets_find = '''请输入你要搜索的内容，或使用 /quit 退出。
-Now type in what you want to find in **{}**, or /quit to quit.'''
-
-find_quit = '退出搜索。 Quitted searching.'
+find_lets_find = '''请输入你要搜索的内容，或使用 /cancel 退出。
+Now type in what you want to find in **{}**, or /cancel to quit.'''
 
 find_no_result = '未找到结果。 No results.'
