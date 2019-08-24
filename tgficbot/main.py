@@ -63,19 +63,23 @@ async def adding_forward_handler(event: NewMessage.Event):
         return
 
     await event.respond(strings.add_getting_infos)
-    channel = await bot.get_input_entity(event.message.fwd_from.channel_id)
-    full_channel = await bot(
-        functions.channels.GetFullChannelRequest(channel=channel))
-    if db.check_channel_saved(full_channel):
+    channel = await bot.get_entity(event.message.fwd_from.channel_id)
+
+    if channel.admin_rights is None:
+        await event.respond(strings.add_1st_step_not_complete)
+        return
+    if db.check_channel_saved(channel):
         await event.respond(strings.add_already_added)
         db.clear_user_state(user)
         return
-    db.save_channel(full_channel)
 
+    db.save_channel(channel)
     async for admin in bot.iter_participants(
             channel, filter=types.ChannelParticipantsAdmins):
-        db.save_channel_admin_relation(channel.channel_id, admin)
+        db.save_channel_admin_relation(channel.id, admin)
 
+    full_channel = await bot(
+        functions.channels.GetFullChannelRequest(channel=channel))
     await event.respond(strings.add_obtain_msg)
     for i in range(full_channel.full_chat.read_inbox_max_id):
         message = await bot.get_messages(channel, ids=i)

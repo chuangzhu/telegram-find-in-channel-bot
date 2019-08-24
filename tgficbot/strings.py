@@ -20,6 +20,9 @@ add_forward_not_channel = '请从一个频道转发。 Please forward from a cha
 
 add_getting_infos = '正在获取频道信息... Getting channel infos...'
 
+add_1st_step_not_complete = '''请先完成第一步：将机器人添加至你的频道。
+Please add this bot to your channel before you forward me channel messages.'''
+
 add_already_added = '频道已添加。 Channel already added. Abort.'
 
 add_obtain_msg = '正在获取以往的频道消息... Obtaining previous messages...'

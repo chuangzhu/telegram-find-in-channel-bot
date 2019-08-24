@@ -62,8 +62,7 @@ def clear_user_state(user: types.User):
     set_user_state(user, state=states.Empty)
 
 
-def check_channel_saved(full_channel: types.ChannelFull):
-    channel = full_channel.chats[0]
+def check_channel_saved(channel: types.Channel):
     cursor.execute('SELECT * FROM channels WHERE channel_id = ?',
                    (channel.id, ))
     if cursor.fetchone() is not None:
@@ -71,8 +70,7 @@ def check_channel_saved(full_channel: types.ChannelFull):
     return False
 
 
-def save_channel(full_channel: types.ChannelFull):
-    channel = full_channel.chats[0]
+def save_channel(channel: types.Channel):
     cursor.execute(
         'INSERT INTO channels (channel_id, username, title) VALUES (?, ?, ?)',
         (channel.id, channel.username, channel.title))
