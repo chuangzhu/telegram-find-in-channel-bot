@@ -34,6 +34,9 @@ private_only = '该命令只能在与机器人私聊时使用。 This command ca
 find_select = '''选择一个频道：
 Select a channel to search:'''
 
+find_no_owned_channel = '''你还没有将任何频道添加至这个机器人，快使用 /add 添加一个吧。
+You haven't had any channel added to this bot. Please /add a channel first.'''
+
 find_access_failed = '''很抱歉，你没有权限访问此频道。
 Sorry, you don't have the permission to access this channel.'''
 

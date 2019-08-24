@@ -92,8 +92,7 @@ def get_user_owned_channels(user: types.User):
     cursor.execute('SELECT channel_id FROM channels_admins WHERE user_id = ?',
                    (user.id, ))
     sqlresult = cursor.fetchall()
-
-    return map(_sqlresult2id, sqlresult)
+    return [x[0] for x in sqlresult]
 
 
 def get_channel_admins(channel_id: types.Channel):

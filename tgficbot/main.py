@@ -100,6 +100,10 @@ async def find_command_handler(event: NewMessage.Event):
     user = await event.get_chat()
     user_owned_channel_ids = db.get_user_owned_channels(user)
 
+    if len(user_owned_channel_ids) == 0:
+        await event.respond(strings.find_no_owned_channel)
+        return
+
     def channel_id2button(channel_id):
         channel_title = db.get_channel_title(channel_id)
         return Button.inline(channel_title, data=channel_id)
