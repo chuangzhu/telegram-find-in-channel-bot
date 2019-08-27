@@ -151,4 +151,9 @@ async def channel_newmessage_handler(event: NewMessage.Event):
         db.save_message(event.message)
 
 
-bot.run_until_disconnected()
+def main():
+    bot.run_until_disconnected()
+
+
+if __name__ == '__main__':
+    main()
