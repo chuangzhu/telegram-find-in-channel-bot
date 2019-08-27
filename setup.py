@@ -10,7 +10,7 @@ def get_requirements():
 
 
 setup(name='telegram-find-in-channel-bot',
-      version='0.1',
+      version='0.1.1',
       author='Zhu Chuang',
       author_email='genelocated@yandex.com',
       packages=find_packages(),
