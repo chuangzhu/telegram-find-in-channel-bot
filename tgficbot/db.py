@@ -118,6 +118,12 @@ def save_message(message: types.Message):
         (message.id, message.to_id.channel_id, message.message))
 
 
+def update_message(message: types.Message):
+    cursor.execute(
+        'UPDATE messages SET content=? WHERE message_id=? AND channel_id=?',
+        (message.message, message.id, message.to_id.channel_id))
+
+
 def find_in_messages(channel_id: int, pattern: str):
     cursor.execute(
         'SELECT message_id, content FROM messages WHERE channel_id = ?',

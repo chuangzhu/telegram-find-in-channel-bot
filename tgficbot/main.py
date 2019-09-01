@@ -1,5 +1,6 @@
 from telethon import TelegramClient
-from telethon.events import NewMessage, CallbackQuery, StopPropagation
+from telethon.events import NewMessage, CallbackQuery, MessageEdited
+from telethon.events import StopPropagation
 from telethon.tl import types, functions
 from telethon.tl.custom import Button
 import os
@@ -149,6 +150,12 @@ async def finding_handler(event: NewMessage.Event):
 async def channel_newmessage_handler(event: NewMessage.Event):
     if event.is_channel:
         db.save_message(event.message)
+
+
+@bot.on(MessageEdited())
+async def channel_messageedited_handler(event: MessageEdited.Event):
+    if event.is_channel:
+        db.update_message(event.message)
 
 
 def main():
