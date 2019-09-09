@@ -120,8 +120,17 @@ def save_message(message: types.Message):
 
 def update_message(message: types.Message):
     cursor.execute(
-        'UPDATE messages SET content=? WHERE message_id=? AND channel_id=?',
-        (message.message, message.id, message.to_id.channel_id))
+        'SELECT rowid FROM messages WHERE message_id=? AND channel_id=?',
+        (message.id, message.to_id.channel_id))
+    sqlresult = cursor.fetchone()
+    if sqlresult is None:
+        cursor.execute(
+            'INSERT INTO messages (message_id, channel_id, content) VALUES (?, ?, ?)',
+            (message.id, message.to_id.channel_id, message.message))
+    else:
+        cursor.execute(
+            'UPDATE messages SET content=? WHERE rowid=?',
+            (message.message, sqlresult[0]))
 
 
 def find_in_messages(channel_id: int, pattern: str):
