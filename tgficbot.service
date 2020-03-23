@@ -3,8 +3,7 @@ Description=Telegram Find in Channel Bot
 After=network-online.target
 
 [Service]
-ExecStart=python3 -m tgficbot.main
-WorkingDirectory=/root/.cache
+ExecStart=python3 -m tgficbot.main --config=/etc/tgficbot.cfg --dbpath=/var/db/tgficbot/
 
 [Install]
 WantedBy=multi-user.target
