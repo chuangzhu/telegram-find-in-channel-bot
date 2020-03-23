@@ -47,7 +47,7 @@ token = 123456789:xxxxxxxxxxxxxxxxxxxx
 python3 -m tgficbot.main
 ```
 
-运行时的数据库将被放在 `~/.cache/tgficbot.db`。
+运行时的数据库将被放在 `~/.cache/tgficbot.db`。如果你的系统没有 `~/.cache/` 路径请创建。
 
 ## Deploy
 
@@ -88,4 +88,4 @@ To run:
 python3 -m tgficbot.main
 ```
 
-The database will be placed at `~/.cahce/tgficbot`.
+The database will be placed at `~/.cahce/tgficbot`. Create `~/.cache/` directory if not exists.

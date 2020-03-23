@@ -1,0 +1,11 @@
+[Unit]
+Description=Telegram Find in Channel Bot
+After=network-online.target
+
+[Service]
+ExecStart=python3 -m tgficbot.main
+WorkingDirectory=/root/.cache
+
+[Install]
+WantedBy=multi-user.target
+
