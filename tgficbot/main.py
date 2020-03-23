@@ -3,22 +3,43 @@ from telethon.events import NewMessage, CallbackQuery, MessageEdited
 from telethon.events import StopPropagation
 from telethon.tl import types, functions
 from telethon.tl.custom import Button
+from telethon.errors.rpcerrorlist import ChannelPrivateError
+
 import os
-import configparser
+import signal
+from pathlib import Path
 import logging
-from tgficbot import db, states
-from tgficbot.states import onstate
-from tgficbot import strings
+import asyncio
+import argparse
+import configparser
+
+from . import states
+from . import strings
+from .db import Database
+
+argp = argparse.ArgumentParser(description='Start Telegram FindInChannelBot.')
+argp.add_argument('--config',
+                  type=str,
+                  default=os.path.expanduser('~/.config/tgficbot.cfg'),
+                  help='specify config file')
+argp.add_argument('--dbpath',
+                  type=str,
+                  default=os.path.expanduser('~/.cache/'),
+                  help='specify directory to store databases')
+args = argp.parse_args()
+
+db = Database(Path(args.dbpath) / 'tgficbot.db')
+onstate = states.StateHandler(db)
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO)
 
 config = configparser.ConfigParser()
-config.read(os.path.expanduser('~/.config/tgficbot.cfg'))
+config.read(args.config)
 
 bot = TelegramClient(
-    'bot', config['api']['id'],
+    str(Path(args.dbpath) / 'bot.session'), config['api']['id'],
     config['api']['hash']).start(bot_token=config['bot']['token'])
 
 
@@ -64,7 +85,11 @@ async def adding_forward_handler(event: NewMessage.Event):
         return
 
     await event.respond(strings.add_getting_infos)
-    channel = await bot.get_entity(event.message.fwd_from.channel_id)
+    try:
+        channel = await bot.get_entity(event.message.fwd_from.channel_id)
+    except ChannelPrivateError:
+        await event.respond(strings.add_1st_step_not_complete)
+        return
 
     if channel.admin_rights is None:
         await event.respond(strings.add_1st_step_not_complete)
@@ -158,8 +183,19 @@ async def channel_messageedited_handler(event: MessageEdited.Event):
         db.update_message(event.message)
 
 
+def sigterm_handler(num, frame):
+    db.conn.commit()
+    os.sys.exit(130)
+
+
 def main():
-    bot.run_until_disconnected()
+    # Save database when being killed
+    signal.signal(signal.SIGTERM, sigterm_handler)
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(bot.disconnected)
+    except KeyboardInterrupt:
+        db.conn.commit()
 
 
 if __name__ == '__main__':
