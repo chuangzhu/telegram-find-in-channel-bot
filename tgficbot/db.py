@@ -124,12 +124,14 @@ class Database:
             'SELECT message_id, content FROM messages WHERE channel_id = ?',
             (channel_id, ))
         messages = self.cursor.fetchall()
+        lower_pattern = pattern.lower()
 
-        def filter_none(m):
-            return m[1] is not None
+        def filter_matched(m):
+            if m[1] is None:
+                return False
+            return m[1].lower().find(lower_pattern) != -1
 
-        messages = filter(filter_none, messages)
-        matched_messages = [m for m in messages if m[1].find(pattern) != -1]
+        matched_messages = filter(filter_matched, messages)
         message_ids = [m[0] for m in matched_messages]
         return message_ids
 
