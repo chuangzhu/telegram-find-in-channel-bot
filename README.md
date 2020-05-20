@@ -8,7 +8,10 @@ The ‘Find in Conversations’ feature in Telegram does not support searching i
 
 `/start` the bot  
 `/add` a channel to the bot  
-`/find` in the channel
+`/find` in the channel  
+`/cancel` the current action
+
+The user interface language of this bot follows your Telegram settings (language packs on Telegram desktop, and system language settings on mobiles). [Please help with translating](./tgficbot/i18n/strings_en.py)!
 
 ## 部署
 
