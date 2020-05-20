@@ -14,8 +14,8 @@ import argparse
 import configparser
 
 from . import states
-from . import strings
 from .db import Database
+from .i18n import withi18n
 
 argp = argparse.ArgumentParser(description='Start Telegram FindInChannelBot.')
 argp.add_argument('--config',
@@ -44,7 +44,8 @@ bot = TelegramClient(
 
 
 @bot.on(NewMessage(pattern='/start'))
-async def start_command_handler(event: NewMessage.Event):
+@withi18n
+async def start_command_handler(event: NewMessage.Event, strings):
     if event.is_private:
         await event.respond(strings.greeting)
         chat = await event.get_chat()
@@ -55,14 +56,16 @@ async def start_command_handler(event: NewMessage.Event):
 
 @bot.on(NewMessage(pattern='/add'))
 @onstate(states.Empty)
-async def add_command_handler(event):
+@withi18n
+async def add_command_handler(event, strings):
     await event.respond(strings.add_guide)
     user = await event.get_chat()
     db.set_user_state(user, states.AddingAChannel)
 
 
 @bot.on(NewMessage(pattern='/cancel'))
-async def cancel_command_handler(event: NewMessage.Event):
+@withi18n
+async def cancel_command_handler(event: NewMessage.Event, strings):
     user = await event.get_chat()
     current_state = db.get_user_state(user)
     if current_state == states.Empty:
@@ -72,9 +75,16 @@ async def cancel_command_handler(event: NewMessage.Event):
     await event.respond(strings.cancel)
 
 
+@bot.on(NewMessage(pattern='/lang'))
+async def lang_command_handler(event: NewMessage.Event):
+    user = await event.get_chat()
+    await event.respond(user.lang_code)
+
+
 @bot.on(NewMessage())
 @onstate(states.AddingAChannel)
-async def adding_forward_handler(event: NewMessage.Event):
+@withi18n
+async def adding_forward_handler(event: NewMessage.Event, strings):
     user = await event.get_chat()
 
     if event.message.fwd_from is None:
@@ -118,7 +128,8 @@ async def adding_forward_handler(event: NewMessage.Event):
 
 @bot.on(NewMessage(pattern='/find'))
 @onstate(states.Empty)
-async def find_command_handler(event: NewMessage.Event):
+@withi18n
+async def find_command_handler(event: NewMessage.Event, strings):
     if not event.is_private:
         await event.respond(strings.private_only)
         return
@@ -141,7 +152,8 @@ async def find_command_handler(event: NewMessage.Event):
 
 @bot.on(CallbackQuery())
 @onstate(states.SelectingAChannelToFind)
-async def select_channel_to_find_handler(event: CallbackQuery.Event):
+@withi18n
+async def select_channel_to_find_handler(event: CallbackQuery.Event, strings):
     user = await event.get_chat()
     channel_id = int(event.data)
 
@@ -158,7 +170,8 @@ async def select_channel_to_find_handler(event: CallbackQuery.Event):
 
 @bot.on(NewMessage())
 @onstate(states.FindingInAChannel)
-async def finding_handler(event: NewMessage.Event):
+@withi18n
+async def finding_handler(event: NewMessage.Event, strings):
     user = await event.get_chat()
     channel_id = db.get_user_selected(user.id)
     pattern = event.raw_text
@@ -173,6 +186,7 @@ async def finding_handler(event: NewMessage.Event):
 
 @bot.on(NewMessage())
 async def channel_newmessage_handler(event: NewMessage.Event):
+    """Continuously listen to channel updates, save new messages"""
     if event.is_channel:
         db.save_message(event.message)
 
