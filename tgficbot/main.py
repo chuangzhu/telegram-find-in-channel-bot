@@ -15,7 +15,7 @@ import configparser
 
 from . import states
 from .db import Database
-from .i18n import withi18n
+from . import i18n
 
 argp = argparse.ArgumentParser(description='Start Telegram FindInChannelBot.')
 argp.add_argument('--config',
@@ -30,6 +30,7 @@ args = argp.parse_args()
 
 db = Database(Path(args.dbpath) / 'tgficbot.db')
 onstate = states.StateHandler(db)
+withi18n = i18n.I18nHandler(db)
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -44,7 +45,7 @@ bot = TelegramClient(
 
 
 @bot.on(NewMessage(pattern='/start'))
-@withi18n
+@i18n.with_telegram_i18n
 async def start_command_handler(event: NewMessage.Event, strings):
     if event.is_private:
         await event.respond(strings.greeting)
@@ -73,12 +74,6 @@ async def cancel_command_handler(event: NewMessage.Event, strings):
     db.clear_user_state(user)
     db.set_user_selected(user.id, None)
     await event.respond(strings.cancel)
-
-
-@bot.on(NewMessage(pattern='/lang'))
-async def lang_command_handler(event: NewMessage.Event):
-    user = await event.get_chat()
-    await event.respond(user.lang_code)
 
 
 @bot.on(NewMessage())
@@ -195,6 +190,39 @@ async def channel_newmessage_handler(event: NewMessage.Event):
 async def channel_messageedited_handler(event: MessageEdited.Event):
     if event.is_channel:
         db.update_message(event.message)
+
+
+@bot.on(NewMessage(pattern='/lang'))
+@onstate(states.Empty)
+@withi18n
+async def lang_command_handler(event: NewMessage.Event, strings):
+    user = await event.get_chat()
+    buttons = [[Button.inline(strings.lang_follow_telegram, data='follow')]]
+    for i in range(0, len(i18n.languages), 3):
+        buttons.append([
+            Button.inline(i18n.languages[langcode], data=langcode)
+            for langcode in list(i18n.languages.keys())[i:i + 3]
+        ])
+    db.set_user_state(user, states.SettingLang)
+    await event.respond(strings.lang_select_lang, buttons=buttons)
+
+
+@bot.on(CallbackQuery())
+@onstate(states.SettingLang)
+async def setting_lang_handler(event: CallbackQuery.Event):
+    user = await event.get_chat()
+    langcode = event.data.decode()
+    if (langcode not in i18n.languages) and (langcode != 'follow'):
+        await event.respond('Unsupported language selected.')
+        print(langcode, file=os.sys.stderr)
+        return
+    db.set_user_lang(user.id, langcode)
+    db.clear_user_state(user)
+
+    async def respond(event, strings):
+        await event.respond(strings.greeting)
+
+    await withi18n(respond)(event)
 
 
 def sigterm_handler(num, frame):

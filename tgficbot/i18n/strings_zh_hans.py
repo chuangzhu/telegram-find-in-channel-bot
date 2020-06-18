@@ -32,3 +32,7 @@ find_access_failed = '很抱歉，你没有权限访问此频道。'
 find_lets_find = '请输入你要搜索的内容，或使用 /cancel 退出。'
 
 find_no_result = '未找到结果。'
+
+lang_follow_telegram = '跟随 Telegram 设置'
+
+lang_select_lang = '选择你的语言：'

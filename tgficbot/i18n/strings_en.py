@@ -32,3 +32,7 @@ find_access_failed = '''Sorry, you don't have the permission to access this chan
 find_lets_find = '''Now type in what you want to find in **{}**, or /cancel to quit.'''
 
 find_no_result = 'No results.'
+
+lang_follow_telegram = 'Follow Telegram settings'
+
+lang_select_lang = 'Select your language:'

@@ -28,7 +28,8 @@ class Database:
                 user_id INTEGER PRIMARY KEY,
                 username TEXT,
                 state INTEGER NOT NULL,
-                selected_id INTEGER
+                selected_id INTEGER,
+                lang TEXT
             );
         """)
         # A junction table to handle many-to-many relationship between channels and admins
@@ -38,6 +39,10 @@ class Database:
                 user_id INTEGER NOT NULL
             );
         """)
+        try:
+            cursor.execute('SELECT lang FROM users')
+        except sqlite3.OperationalError:
+            cursor.execute('ALTER TABLE users ADD lang TEXT')
         self.conn = conn
         self.cursor = cursor
 
@@ -142,5 +147,14 @@ class Database:
 
     def get_user_selected(self, user_id: int):
         self.cursor.execute('SELECT selected_id FROM users WHERE user_id=?',
+                            (user_id, ))
+        return self.cursor.fetchone()[0]
+
+    def set_user_lang(self, user_id: int, langcode: str):
+        self.cursor.execute('UPDATE users SET lang=? WHERE user_id=?',
+                            (langcode, user_id))
+
+    def get_user_lang(self, user_id: int):
+        self.cursor.execute('SELECT lang FROM users WHERE user_id=?',
                             (user_id, ))
         return self.cursor.fetchone()[0]

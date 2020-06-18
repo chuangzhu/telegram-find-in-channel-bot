@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='telegram-find-in-channel-bot',
-      version='0.1.4',
+      version='0.1.5',
       author='Zhu Chuang',
       author_email='genelocated@yandex.com',
       packages=find_packages(),
