@@ -45,14 +45,15 @@ bot = TelegramClient(
 
 
 @bot.on(NewMessage(pattern='/start'))
-@i18n.with_telegram_i18n
+@withi18n
 async def start_command_handler(event: NewMessage.Event, strings):
-    if event.is_private:
-        await event.respond(strings.greeting)
-        chat = await event.get_chat()
-        db.save_user(chat)
-        db.conn.commit()
-        raise StopPropagation
+    if not event.is_private:
+        return
+    await event.respond(strings.greeting)
+    chat = await event.get_chat()
+    db.save_user(chat)
+    db.conn.commit()
+    raise StopPropagation
 
 
 @bot.on(NewMessage(pattern='/add'))
@@ -214,7 +215,6 @@ async def setting_lang_handler(event: CallbackQuery.Event):
     langcode = event.data.decode()
     if (langcode not in i18n.languages) and (langcode != 'follow'):
         await event.respond('Unsupported language selected.')
-        print(langcode, file=os.sys.stderr)
         return
     db.set_user_lang(user.id, langcode)
     db.clear_user_state(user)

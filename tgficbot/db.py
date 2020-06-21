@@ -48,8 +48,9 @@ class Database:
 
     def save_user(self, user: types.User):
         self.cursor.execute(
-            'INSERT OR REPLACE INTO users (user_id, username, state) VALUES (?, ?, ?)',
+            'INSERT OR IGNORE INTO users (user_id, username, state) VALUES (?, ?, ?)',
             (user.id, user.username, states.Empty))
+        self.clear_user_state(user)
 
     def get_user_state(self, user: types.User):
         self.cursor.execute('SELECT state FROM users WHERE user_id = ?',
