@@ -29,7 +29,7 @@ class Database:
                 username TEXT,
                 state INTEGER NOT NULL,
                 selected_id INTEGER,
-                lang TEXT
+                lang TEXT DEFAULT follow NOT NULL
             );
         """)
         # A junction table to handle many-to-many relationship between channels and admins
@@ -42,7 +42,7 @@ class Database:
         try:
             cursor.execute('SELECT lang FROM users')
         except sqlite3.OperationalError:
-            cursor.execute('ALTER TABLE users ADD lang TEXT')
+            cursor.execute('ALTER TABLE users ADD lang TEXT DEFAULT follow NOT NULL')
         self.conn = conn
         self.cursor = cursor
 
