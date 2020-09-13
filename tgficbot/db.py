@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import re
 from telethon.tl import types
 from . import states
 
@@ -7,6 +8,8 @@ from . import states
 class Database:
     def __init__(self, dbpath):
         conn = sqlite3.connect(dbpath)
+        conn.create_function('REGEXP', 2,
+                             lambda p, s: re.search(p, s) is not None)
         cursor = conn.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS channels (
@@ -42,7 +45,8 @@ class Database:
         try:
             cursor.execute('SELECT lang FROM users')
         except sqlite3.OperationalError:
-            cursor.execute('ALTER TABLE users ADD lang TEXT DEFAULT follow NOT NULL')
+            cursor.execute(
+                'ALTER TABLE users ADD lang TEXT DEFAULT follow NOT NULL')
         self.conn = conn
         self.cursor = cursor
 
@@ -127,18 +131,26 @@ class Database:
 
     def find_in_messages(self, channel_id: int, pattern: str):
         self.cursor.execute(
-            'SELECT message_id, content FROM messages WHERE channel_id = ?',
-            (channel_id, ))
+            'SELECT message_id FROM messages WHERE channel_id = ? AND content LIKE ?',
+            (channel_id, f'%{pattern}%'))
         messages = self.cursor.fetchall()
-        lower_pattern = pattern.lower()
+        message_ids = [m[0] for m in messages]
+        return message_ids
 
-        def filter_matched(m):
-            if m[1] is None:
-                return False
-            return m[1].lower().find(lower_pattern) != -1
+    def find_in_messages_glob(self, channel_id: int, pattern: str):
+        self.cursor.execute(
+            'SELECT message_id FROM messages WHERE channel_id = ? AND content GLOB ?',
+            (channel_id, f'*{pattern}*'))
+        messages = self.cursor.fetchall()
+        message_ids = [m[0] for m in messages]
+        return message_ids
 
-        matched_messages = filter(filter_matched, messages)
-        message_ids = [m[0] for m in matched_messages]
+    def find_in_messages_regexp(self, channel_id: int, pattern: str):
+        self.cursor.execute(
+            'SELECT message_id FROM messages WHERE channel_id = ? AND content REGEXP ?',
+            (channel_id, pattern))
+        messages = self.cursor.fetchall()
+        message_ids = [m[0] for m in messages]
         return message_ids
 
     def set_user_selected(self, user_id: int, channel_id: int):
