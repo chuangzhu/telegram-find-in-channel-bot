@@ -36,3 +36,20 @@ find_no_result = '未找到结果。'
 lang_follow_telegram = '跟随 Telegram 设置'
 
 lang_select_lang = '选择你的语言：'
+
+help_general = '''\
+/add - 添加一个频道
+/find - 在一个频道中搜索
+/cancel - 取消当前操作
+/lang - 设置机器人的界面语言
+
+使用 `/help [命令]` 以查看某个具体命令的帮助。'''
+
+help_commands = {
+    'add': '**用法**：\n`    /add`\n\n添加一个频道',
+    'find': '**用法**：\n    `/find`\n\n在一个频道中搜索',
+    'cancel': '**用法**：\n    `/cancel`\n\n取消当前操作',
+    'lang': '**用法**：\n    `/lang`\n\n设置机器人的界面语言'
+}
+
+help_command_not_found = '`/{}` 命令不存在'

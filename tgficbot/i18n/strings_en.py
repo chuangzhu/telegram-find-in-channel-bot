@@ -36,3 +36,20 @@ find_no_result = 'No results.'
 lang_follow_telegram = 'Follow Telegram settings'
 
 lang_select_lang = 'Select your language:'
+
+help_general = '''\
+/add - Add a channel to the bot
+/find - Find in a channel
+/cancel - Cancel or quit current operation
+/lang - Set bot language
+
+Use `/help [command]` to view help about a specific command.'''
+
+help_commands = {
+    'add': '**Usage**:\n`    /add`\n\nAdd a channel to the bot',
+    'find': '**Usage**:\n    `/find`\n\nFind in a channel',
+    'cancel': '**Usage**:\n    `/cancel`\n\nCancel or quit current operation',
+    'lang': '**Usage**:\n    `/lang`\n\nSet bot language'
+}
+
+help_command_not_found = 'Command not found: `/{}`'

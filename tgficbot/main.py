@@ -225,6 +225,21 @@ async def setting_lang_handler(event: CallbackQuery.Event):
     await withi18n(respond)(event)
 
 
+@bot.on(NewMessage(pattern=r'/help ?(\w*)'))
+@onstate(states.Empty)
+@withi18n
+async def help_command_handler(event: NewMessage.Event, strings):
+    # May be the specific command or ''
+    command = event.pattern_match.group(1)
+    if not command:
+        await event.respond(strings.help_general)
+        return
+    if command in strings.help_commands:
+        await event.respond(strings.help_commands[command])
+        return
+    await event.respond(strings.help_command_not_found.format(command))
+
+
 def sigterm_handler(num, frame):
     db.conn.commit()
     os.sys.exit(130)
