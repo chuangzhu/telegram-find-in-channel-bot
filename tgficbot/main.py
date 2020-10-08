@@ -6,6 +6,7 @@ from telethon.tl.custom import Button
 from telethon.errors.rpcerrorlist import ChannelPrivateError
 
 import os
+import re
 import signal
 from pathlib import Path
 import logging
@@ -122,10 +123,21 @@ async def adding_forward_handler(event: NewMessage.Event, strings):
     db.clear_user_state(user)
 
 
-@bot.on(NewMessage(pattern='/find'))
+find_command_parser = argparse.ArgumentParser()
+find_command_parser.add_argument('channel')
+find_command_parser.add_argument('pattern')
+find_command_parser.add_argument('-r', '--regex', action='store_true')
+find_command_parser.error = lambda m: None
+
+
+@bot.on(NewMessage(pattern=r'/find ?(.*?)'))
 @onstate(states.Empty)
 @withi18n
 async def find_command_handler(event: NewMessage.Event, strings):
+    raw_args = event.pattern_match.group(1)
+    if raw_args:
+        parsed_args = find_command_parser.parse_known_args(re.split('\s+', raw_args))
+        # TODO: find with re directly
     if not event.is_private:
         await event.respond(strings.private_only)
         return
