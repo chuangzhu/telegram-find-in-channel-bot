@@ -50,7 +50,7 @@ bot = TelegramClient(
 
 @bot.on(NewMessage(pattern='/start'))
 @withi18n
-async def start_command_handler(event: NewMessage.Event, strings):
+async def start_command_handler(event: NewMessage.Event, _):
     if not event.is_private:
         return
     await event.respond(strings.greeting)
@@ -63,7 +63,7 @@ async def start_command_handler(event: NewMessage.Event, strings):
 @bot.on(NewMessage(pattern='/add'))
 @onstate(states.Empty)
 @withi18n
-async def add_command_handler(event, strings):
+async def add_command_handler(event, _):
     await event.respond(strings.add_guide)
     user = await event.get_chat()
     db.set_user_state(user, states.AddingAChannel)
@@ -71,7 +71,7 @@ async def add_command_handler(event, strings):
 
 @bot.on(NewMessage(pattern='/cancel'))
 @withi18n
-async def cancel_command_handler(event: NewMessage.Event, strings):
+async def cancel_command_handler(event: NewMessage.Event, _):
     user = await event.get_chat()
     current_state = db.get_user_state(user)
     if current_state == states.Empty:
@@ -84,7 +84,7 @@ async def cancel_command_handler(event: NewMessage.Event, strings):
 @bot.on(NewMessage())
 @onstate(states.AddingAChannel)
 @withi18n
-async def adding_forward_handler(event: NewMessage.Event, strings):
+async def adding_forward_handler(event: NewMessage.Event, _):
     user = await event.get_chat()
 
     if event.message.fwd_from is None:
@@ -129,7 +129,7 @@ async def adding_forward_handler(event: NewMessage.Event, strings):
 @bot.on(NewMessage(pattern=r'^/find +(.+)'))
 @onstate(states.Empty)
 @withi18n
-async def arged_find_command_handler(event: NewMessage.Event, strings):
+async def arged_find_command_handler(event: NewMessage.Event, _):
     """Find a pattern in a channel using a CLI-like syntax"""
     raw_args = event.pattern_match.group(1)
     try:
@@ -171,7 +171,7 @@ async def arged_find_command_handler(event: NewMessage.Event, strings):
 @bot.on(NewMessage(pattern=r'^/find$'))
 @onstate(states.Empty)
 @withi18n
-async def find_command_handler(event: NewMessage.Event, strings):
+async def find_command_handler(event: NewMessage.Event, _):
     """Finding interactively"""
     if not event.is_private:
         await event.respond(strings.private_only)
@@ -196,7 +196,7 @@ async def find_command_handler(event: NewMessage.Event, strings):
 @bot.on(CallbackQuery())
 @onstate(states.SelectingAChannelToFind)
 @withi18n
-async def select_channel_to_find_handler(event: CallbackQuery.Event, strings):
+async def select_channel_to_find_handler(event: CallbackQuery.Event, _):
     user = await event.get_chat()
     channel_id = int(event.data)
 
@@ -214,7 +214,7 @@ async def select_channel_to_find_handler(event: CallbackQuery.Event, strings):
 @bot.on(NewMessage())
 @onstate(states.FindingInAChannel)
 @withi18n
-async def finding_handler(event: NewMessage.Event, strings):
+async def finding_handler(event: NewMessage.Event, _):
     user = await event.get_chat()
     channel_id = db.get_user_selected(user.id)
     pattern = event.raw_text
@@ -243,16 +243,16 @@ async def channel_messageedited_handler(event: MessageEdited.Event):
 @bot.on(NewMessage(pattern='/lang'))
 @onstate(states.Empty)
 @withi18n
-async def lang_command_handler(event: NewMessage.Event, strings):
+async def lang_command_handler(event: NewMessage.Event, _):
     user = await event.get_chat()
-    buttons = [[Button.inline(strings.lang_follow_telegram, data='follow')]]
-    for i in range(0, len(i18n.languages), 3):
+    buttons = [[Button.inline(_('lang_follow_telegram'), data='follow')]]
+    for i in range(0, len(i18n.translates), 3):
         buttons.append([
             Button.inline(i18n.languages[langcode], data=langcode)
-            for langcode in list(i18n.languages.keys())[i:i + 3]
+            for langcode in list(i18n.translates.keys())[i:i + 3]
         ])
     db.set_user_state(user, states.SettingLang)
-    await event.respond(strings.lang_select_lang, buttons=buttons)
+    await event.respond(_('lang_select_lang'), buttons=buttons)
 
 
 @bot.on(CallbackQuery())
@@ -275,16 +275,16 @@ async def setting_lang_handler(event: CallbackQuery.Event):
 @bot.on(NewMessage(pattern=r'/help ?(\w*)'))
 @onstate(states.Empty)
 @withi18n
-async def help_command_handler(event: NewMessage.Event, strings):
+async def help_command_handler(event: NewMessage.Event, _):
     # May be the specific command or ''
     command = event.pattern_match.group(1)
     if not command:
-        await event.respond(strings.help_general)
+        await event.respond(_('help_general'))
         return
-    if command in strings.help_commands:
-        await event.respond(strings.help_commands[command])
+    if command in ['add', 'find', 'cancel', 'lang']:
+        await event.respond(_('help_command_' + command))
         return
-    await event.respond(strings.help_command_not_found.format(command))
+    await event.respond(_('help_command_not_found').format(command))
 
 
 def sigterm_handler(num, frame):

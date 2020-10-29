@@ -1,0 +1,97 @@
+msgid "add_1st_step_not_complete"
+msgstr "請先完成第一步：將機器人添加至你的頻道。"
+
+msgid "add_already_added"
+msgstr "頻道已添加。"
+
+msgid "add_finished"
+msgstr "頻道已添加。"
+
+msgid "add_forward_not_channel"
+msgstr "請從一個頻道轉發。"
+
+msgid "add_getting_infos"
+msgstr "正在獲取頻道信息..."
+
+msgid "add_guide"
+msgstr ""
+"要添加你的頻道，請：\n"
+"\n"
+"1. 將這個機器人作爲管理員添加至你的頻道；\n"
+"2. 將你的頻道中的一條信息轉發給我。"
+
+msgid "add_not_forward"
+msgstr "請將你的頻道中任意一條消息轉發給我，或使用 /cancel 來取消。"
+
+msgid "add_obtain_msg"
+msgstr "正在獲取以往的頻道消息..."
+
+msgid "cancel"
+msgstr "已取消。"
+
+msgid "find_access_failed"
+msgstr "很抱歉，你沒有權限訪問此頻道。"
+
+msgid "find_lets_find"
+msgstr "請輸入你要搜索的內容，或使用 /cancel 退出。"
+
+msgid "find_no_owned_channel"
+msgstr "你還沒有將任何頻道添加至這個機器人，快使用 /add 添加一個吧。"
+
+msgid "find_no_result"
+msgstr "未找到結果。"
+
+msgid "find_select"
+msgstr "選擇一個頻道："
+
+msgid "greeting"
+msgstr "你好！請先使用 /add 命令將你的頻道添加至這個機器人，然後就可以使用 /find 進行搜索啦。"
+
+msgid "help_command_not_found"
+msgstr "`/{}` 命令不存在"
+
+msgid "help_general"
+msgstr ""
+"/add - 添加一個頻道\n"
+"/find - 在一個頻道中搜索\n"
+"/cancel - 取消當前操作\n"
+"/lang - 設置機器人的界面語言\n"
+"使用 `/help [命令]` 以查看某個具體命令的幫助。"
+
+msgid "lang_follow_telegram"
+msgstr "跟隨 Telegram 設置"
+
+msgid "lang_select_lang"
+msgstr "選擇你的語言："
+
+msgid "private_only"
+msgstr "該命令只能在與機器人私聊時使用。"
+
+msgid "help_command_add"
+msgstr ""
+"**用法**：\n"
+"`    /add`\n"
+"\n"
+"添加一個頻道"
+
+msgid "help_command_find"
+msgstr ""
+"**用法**：\n"
+"    `/find`\n"
+"\n"
+"在一個頻道中搜索"
+
+msgid "help_command_cancel"
+msgstr ""
+"**用法**：\n"
+"    `/cancel`\n"
+"\n"
+"取消當前操作"
+
+msgid "help_command_lang"
+msgstr ""
+"**用法**：\n"
+"    `/lang`\n"
+"\n"
+"設置機器人的界面語言"
+
