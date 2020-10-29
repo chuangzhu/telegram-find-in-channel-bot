@@ -138,35 +138,34 @@ async def arged_find_command_handler(event: NewMessage.Event, strings):
         await event.respond(
             'Invalid command, use `/help find` for more information')
         return
-    argch = args[0]
+    channel_pattern = args[0]
     pattern = ' '.join(args[1:])
-
     user = await event.get_chat()
-    channel_ids = db.get_user_owned_channels(user)
-    # Find in channels names, then channel titles. The priority matters.
-    channel_desciptors = [(db.get_channel_name(id_), id_) for id_ in channel_ids] + \
-                         [(db.get_channel_title(id_), id_) for id_ in channel_ids]
-    # Remove empty channel username
-    channel_desciptors = list(filter(lambda d: d[0], channel_desciptors))
-    print(channel_desciptors)
-    matched_ids = [k for v, k in channel_desciptors if pattern in v]
-    # Remove duplicates
-    matched_ids = list(dict.fromkeys(matched_ids))
 
-    if not len(matched_ids):
-        await event.respond('No such channel: ' + argch)
-        return
-    if len(matched_ids) > 1:
-        await event.respond(
-            'Multiple channels matched, searching in **{}**'.format(
-                db.get_channel_title(matched_ids[0])))
+    if channel_pattern.startswith('@'):
+        channel_id = db.get_channel_id_from_name(user,
+                                                 channel_pattern.lstrip('@'))
+        if not channel_id:
+            await event.respond('No such channel: ' + channel_pattern)
+            return
+    else:
+        matched_ids = db.match_user_owned_channels_with_pattern(
+            user, channel_pattern)
+        if not len(matched_ids):
+            await event.respond('No such channel: ' + channel_pattern)
+            return
+        if len(matched_ids) > 1:
+            await event.respond(
+                'Multiple channels matched, finding in **{}**'.format(
+                    db.get_channel_title(matched_ids[0])))
+        channel_id = matched_ids[0]
 
-    found_message_ids = db.find_in_messages(matched_ids[0], pattern)
+    found_message_ids = db.find_in_messages(channel_id, pattern)
     if not len(found_message_ids):
         await event.respond(strings.find_no_result)
         return
     for message_id in found_message_ids:
-        await bot.forward_messages(user, message_id, matched_ids[0])
+        await bot.forward_messages(user, message_id, channel_id)
 
 
 @bot.on(NewMessage(pattern=r'^/find$'))

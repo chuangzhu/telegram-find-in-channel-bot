@@ -6,6 +6,10 @@ from typing import List
 from . import states
 
 
+def first_fetchall(sqlresult: List[tuple]):
+    return [x[0] for x in sqlresult]
+
+
 class Database:
     def __init__(self, dbpath):
         conn = sqlite3.connect(dbpath)
@@ -93,7 +97,7 @@ class Database:
             'SELECT channel_id FROM channels_admins WHERE user_id = ?',
             (user.id, ))
         sqlresult = self.cursor.fetchall()
-        return [x[0] for x in sqlresult]
+        return first_fetchall(sqlresult)
 
     def get_channel_admins(self, channel_id: int):
         self.cursor.execute(
@@ -101,7 +105,7 @@ class Database:
             (channel_id, ))
         sqlresult = self.cursor.fetchall()
         # Return ids only
-        return map(lambda x: x[0], sqlresult)
+        return first_fetchall(sqlresult)
 
     def is_channel_admins(self, user: types.User, channel_id: int) -> bool:
         return user.id in self.get_channel_admins(channel_id)
@@ -117,17 +121,36 @@ class Database:
             (channel_id, ))
         return self.cursor.fetchone()[0]
 
-    def find_user_owned_channel_with_title(self, user: types.User, pattern: str) -> int:
+    def match_user_owned_channels_with_pattern(self, user: types.User,
+                                               pattern: str) -> List[int]:
+        sqlquery = """
+            SELECT channel_id FROM channels
+            WHERE channel_id IN (
+                SELECT channel_id FROM channels_admins WHERE user_id = ?
+            ) AND {0} LIKE ?
+            ORDER BY {0}
+        """
+        # Find in channels names, then channel titles. The priority matters.
+        self.cursor.execute(
+            sqlquery.format('username'), (user.id, f'%{pattern}%'))
+        matched_ids = first_fetchall(self.cursor.fetchall())
+        self.cursor.execute(
+            sqlquery.format('title'), (user.id, f'%{pattern}%'))
+        matched_ids += first_fetchall(self.cursor.fetchall())
+        # Remove duplicates
+        matched_ids = list(dict.fromkeys(matched_ids))
+        return matched_ids
+
+    def get_channel_id_from_name(self, user: types.User, channel_name: str) -> int:
         self.cursor.execute(
             """
             SELECT channel_id FROM channels
             WHERE channel_id IN (
                 SELECT channel_id FROM channels_admins WHERE user_id = ?
-            ) AND title LIKE ?
-            ORDER BY title
-            """, (user.id, f'%{pattern}%'))
-        sqlresult = self.cursor.fetchall()
-        return sqlresult
+            ) AND username = ?
+        """, (user.id, channel_name))
+        sqlresult = self.cursor.fetchone()
+        return sqlresult and sqlresult[0]
 
     def save_message(self, message: types.Message):
         if not isinstance(message, types.Message):
@@ -156,7 +179,7 @@ class Database:
             'SELECT message_id FROM messages WHERE channel_id = ? AND content LIKE ?',
             (channel_id, f'%{pattern}%'))
         messages = self.cursor.fetchall()
-        message_ids = [m[0] for m in messages]
+        message_ids = first_fetchall(messages)
         return message_ids
 
     def find_in_messages_glob(self, channel_id: int, pattern: str):
@@ -164,7 +187,7 @@ class Database:
             'SELECT message_id FROM messages WHERE channel_id = ? AND content GLOB ?',
             (channel_id, f'*{pattern}*'))
         messages = self.cursor.fetchall()
-        message_ids = [m[0] for m in messages]
+        message_ids = first_fetchall(messages)
         return message_ids
 
     def find_in_messages_regexp(self, channel_id: int, pattern: str):
@@ -172,7 +195,7 @@ class Database:
             'SELECT message_id FROM messages WHERE channel_id = ? AND content REGEXP ?',
             (channel_id, pattern))
         messages = self.cursor.fetchall()
-        message_ids = [m[0] for m in messages]
+        message_ids = first_fetchall(messages)
         return message_ids
 
     def set_user_selected(self, user_id: int, channel_id: int):
