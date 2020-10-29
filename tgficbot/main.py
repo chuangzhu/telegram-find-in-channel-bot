@@ -53,7 +53,8 @@ bot = TelegramClient(
 async def start_command_handler(event: NewMessage.Event, _):
     if not event.is_private:
         return
-    await event.respond(strings.greeting)
+    await event.respond(
+        _('Hi! To /find in your channel, you must /add it to this bot first.'))
     chat = await event.get_chat()
     db.save_user(chat)
     db.conn.commit()
@@ -64,7 +65,11 @@ async def start_command_handler(event: NewMessage.Event, _):
 @onstate(states.Empty)
 @withi18n
 async def add_command_handler(event, _):
-    await event.respond(strings.add_guide)
+    await event.respond(
+        _('To add your channel, do the following:\n'
+          '\n'
+          '1. Add this bot to your channel as an admin;\n'
+          '2. Forward a message from the channel to me.'))
     user = await event.get_chat()
     db.set_user_state(user, states.AddingAChannel)
 
@@ -78,7 +83,7 @@ async def cancel_command_handler(event: NewMessage.Event, _):
         return
     db.clear_user_state(user)
     db.set_user_selected(user.id, None)
-    await event.respond(strings.cancel)
+    await event.respond(_('Aborted.'))
 
 
 @bot.on(NewMessage())
@@ -88,24 +93,30 @@ async def adding_forward_handler(event: NewMessage.Event, _):
     user = await event.get_chat()
 
     if event.message.fwd_from is None:
-        await event.respond(strings.add_not_forward)
+        await event.respond(
+            _('Please forward any message from your channel to me, '
+              'or /cancel to abort.'))
         return
     if event.message.fwd_from.channel_id is None:
-        await event.respond(strings.add_forward_not_channel)
+        await event.respond(_('Please forward from a channel.'))
         return
 
-    await event.respond(strings.add_getting_infos)
+    await event.respond(_('Getting channel infos...'))
     try:
         channel = await bot.get_entity(event.message.fwd_from.channel_id)
     except ChannelPrivateError:
-        await event.respond(strings.add_1st_step_not_complete)
+        await event.respond(
+            _('Please add this bot to your channel before you forward me channel messages.'
+              ))
         return
 
     if channel.admin_rights is None:
-        await event.respond(strings.add_1st_step_not_complete)
+        await event.respond(
+            _('Please add this bot to your channel before you forward me channel messages.'
+              ))
         return
     if db.check_channel_saved(channel):
-        await event.respond(strings.add_already_added)
+        await event.respond(_('Channel already added. Abort.'))
         db.clear_user_state(user)
         return
 
@@ -116,13 +127,13 @@ async def adding_forward_handler(event: NewMessage.Event, _):
 
     full_channel = await bot(
         functions.channels.GetFullChannelRequest(channel=channel))
-    await event.respond(strings.add_obtain_msg)
+    await event.respond(_('Obtaining previous messages...'))
     for i in range(full_channel.full_chat.read_inbox_max_id):
         message = await bot.get_messages(channel, ids=i)
         db.save_message(message)
 
     db.conn.commit()
-    await event.respond(strings.add_finished)
+    await event.respond(_('Add finished.'))
     db.clear_user_state(user)
 
 
@@ -136,7 +147,7 @@ async def arged_find_command_handler(event: NewMessage.Event, _):
         args = shlex.split(raw_args)
     except ValueError:
         await event.respond(
-            'Invalid command, use `/help find` for more information')
+            _('Invalid command, use `/help find` for more information'))
         return
     channel_pattern = args[0]
     pattern = ' '.join(args[1:])
@@ -146,23 +157,25 @@ async def arged_find_command_handler(event: NewMessage.Event, _):
         channel_id = db.get_channel_id_from_name(user,
                                                  channel_pattern.lstrip('@'))
         if not channel_id:
-            await event.respond('No such channel: ' + channel_pattern)
+            await event.respond(
+                _('No such channel: **{}**').format(channel_pattern))
             return
     else:
         matched_ids = db.match_user_owned_channels_with_pattern(
             user, channel_pattern)
         if not len(matched_ids):
-            await event.respond('No such channel: ' + channel_pattern)
+            await event.respond(
+                _('No such channel: **{}**').format(channel_pattern))
             return
         if len(matched_ids) > 1:
             await event.respond(
-                'Multiple channels matched, finding in **{}**'.format(
+                _('Multiple channels matched, finding in **{}**').format(
                     db.get_channel_title(matched_ids[0])))
         channel_id = matched_ids[0]
 
     found_message_ids = db.find_in_messages(channel_id, pattern)
     if not len(found_message_ids):
-        await event.respond(strings.find_no_result)
+        await event.respond('No results.')
         return
     for message_id in found_message_ids:
         await bot.forward_messages(user, message_id, channel_id)
@@ -174,14 +187,17 @@ async def arged_find_command_handler(event: NewMessage.Event, _):
 async def find_command_handler(event: NewMessage.Event, _):
     """Finding interactively"""
     if not event.is_private:
-        await event.respond(strings.private_only)
+        await event.respond(
+            _('This command can only be used in private chat.'))
         return
 
     user = await event.get_chat()
     user_owned_channel_ids = db.get_user_owned_channels(user)
 
     if len(user_owned_channel_ids) == 0:
-        await event.respond(strings.find_no_owned_channel)
+        await event.respond(
+            _("You haven't had any channel added to this bot. Please /add a channel first."
+              ))
         return
 
     def channel_id2button(channel_id):
@@ -189,7 +205,7 @@ async def find_command_handler(event: NewMessage.Event, _):
         return Button.inline(channel_title, data=channel_id)
 
     buttons = list(map(channel_id2button, user_owned_channel_ids))
-    await event.respond(strings.find_select, buttons=buttons)
+    await event.respond(_('Select a channel to search:'), buttons=buttons)
     db.set_user_state(user, states.SelectingAChannelToFind)
 
 
@@ -201,14 +217,17 @@ async def select_channel_to_find_handler(event: CallbackQuery.Event, _):
     channel_id = int(event.data)
 
     if user.id not in db.get_channel_admins(channel_id):
-        await event.respond(strings.find_access_failed)
+        await event.respond(
+            _("Sorry, you don't have the permission to access this channel."))
         db.clear_user_state(user)
         return
 
     channel_title = db.get_channel_title(channel_id)
     db.set_user_state(user, states.FindingInAChannel)
     db.set_user_selected(user.id, channel_id)
-    await event.respond(strings.find_lets_find.format(channel_title))
+    await event.respond(
+        _('Now type in what you want to find in **{}**, or /cancel to quit.').
+        format(channel_title))
 
 
 @bot.on(NewMessage())
@@ -221,7 +240,7 @@ async def finding_handler(event: NewMessage.Event, _):
 
     found_message_ids = db.find_in_messages(channel_id, pattern)
     if len(found_message_ids) == 0:
-        await event.respond(strings.find_no_result)
+        await event.respond(_('No results.'))
         return
     for message_id in found_message_ids:
         await bot.forward_messages(user, message_id, channel_id)
@@ -245,14 +264,14 @@ async def channel_messageedited_handler(event: MessageEdited.Event):
 @withi18n
 async def lang_command_handler(event: NewMessage.Event, _):
     user = await event.get_chat()
-    buttons = [[Button.inline(_('lang_follow_telegram'), data='follow')]]
+    buttons = [[Button.inline(_('Follow Telegram settings'), data='follow')]]
     for i in range(0, len(i18n.translates), 3):
         buttons.append([
             Button.inline(i18n.languages[langcode], data=langcode)
             for langcode in list(i18n.translates.keys())[i:i + 3]
         ])
     db.set_user_state(user, states.SettingLang)
-    await event.respond(_('lang_select_lang'), buttons=buttons)
+    await event.respond(_('Select your language:'), buttons=buttons)
 
 
 @bot.on(CallbackQuery())
@@ -266,8 +285,10 @@ async def setting_lang_handler(event: CallbackQuery.Event):
     db.set_user_lang(user.id, langcode)
     db.clear_user_state(user)
 
-    async def respond(event, strings):
-        await event.respond(strings.greeting)
+    async def respond(event, _):
+        await event.respond(
+            _('Hi! To /find in your channel, you must /add it to this bot first.'
+              ))
 
     await withi18n(respond)(event)
 
@@ -279,12 +300,27 @@ async def help_command_handler(event: NewMessage.Event, _):
     # May be the specific command or ''
     command = event.pattern_match.group(1)
     if not command:
-        await event.respond(_('help_general'))
+        await event.respond(
+            _('/add - Add a channel to the bot\n'
+              '/find - Find in a channel\n'
+              '/cancel - Cancel or quit current operation\n'
+              '/lang - Set bot language\n'
+              '\n'
+              'Use `/help [command]` to view help about a specific command.'))
         return
-    if command in ['add', 'find', 'cancel', 'lang']:
-        await event.respond(_('help_command_' + command))
-        return
-    await event.respond(_('help_command_not_found').format(command))
+
+    if command == 'add':
+        await event.respond(
+            _('**Usage**:\n    `/add`\n\nAdd a channel to the bot'))
+    elif command == 'find':
+        await event.respond(_('**Usage**:\n    `/find`\n\nFind in a channel'))
+    elif command == 'cancel':
+        await event.respond(
+            _('**Usage**:\n    `/cancel`\n\nCancel or quit current operation'))
+    elif command == 'lang':
+        await event.respond(_('**Usage**:\n    `/lang`\n\nSet bot language'))
+    else:
+        await event.respond(_('Command not found: `/{}`').format(command))
 
 
 def sigterm_handler(num, frame):

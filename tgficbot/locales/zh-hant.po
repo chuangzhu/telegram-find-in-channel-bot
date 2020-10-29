@@ -1,0 +1,178 @@
+# Language zh-hant translations for PACKAGE package.
+# Copyright (C) 2020 ORGANIZATION
+# Zhu Chuang <genelocated@yandex.com>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2020-10-30 06:55+0800\n"
+"PO-Revision-Date: 2020-10-30 07:00+0800\n"
+"Last-Translator: Zhu Chuang <genelocated@yandex.com>\n"
+"Language-Team: Language zh-hant\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"Language: zh-hant\n"
+
+#: ../main.py:57 ../main.py:290
+msgid "Hi! To /find in your channel, you must /add it to this bot first."
+msgstr "你好！請先使用 /add 命令將你的頻道添加至這個機器人，然後就可以使用 /find 進行搜索啦。"
+
+#: ../main.py:69
+msgid ""
+"To add your channel, do the following:\n"
+"\n"
+"1. Add this bot to your channel as an admin;\n"
+"2. Forward a message from the channel to me."
+msgstr ""
+"要添加你的頻道，請：\n"
+"\n"
+"1. 將這個機器人作爲管理員添加至你的頻道；\n"
+"2. 將你的頻道中的一條信息轉發給我。"
+
+#: ../main.py:86
+msgid "Aborted."
+msgstr "已取消。"
+
+#: ../main.py:97
+msgid ""
+"Please forward any message from your channel to me, or /cancel to abort."
+msgstr "請將你的頻道中任意一條消息轉發給我，或使用 /cancel 來取消。"
+
+#: ../main.py:101
+msgid "Please forward from a channel."
+msgstr "請從一個頻道轉發。"
+
+#: ../main.py:104
+msgid "Getting channel infos..."
+msgstr "正在獲取頻道信息..."
+
+#: ../main.py:109 ../main.py:115
+msgid ""
+"Please add this bot to your channel before you forward me channel messages."
+msgstr "請先完成第一步：將機器人添加至你的頻道。"
+
+#: ../main.py:119
+msgid "Channel already added. Abort."
+msgstr "頻道已添加。"
+
+#: ../main.py:130
+msgid "Obtaining previous messages..."
+msgstr "正在獲取以往的頻道消息..."
+
+#: ../main.py:136
+msgid "Add finished."
+msgstr "頻道已添加。"
+
+#: ../main.py:150
+msgid "Invalid command, use `/help find` for more information"
+msgstr ""
+
+#: ../main.py:161 ../main.py:168
+msgid "No such channel: **{}**"
+msgstr ""
+
+#: ../main.py:172
+msgid "Multiple channels matched, finding in **{}**"
+msgstr ""
+
+#: ../main.py:191
+msgid "This command can only be used in private chat."
+msgstr "該命令只能在與機器人私聊時使用。"
+
+#: ../main.py:199
+msgid ""
+"You haven't had any channel added to this bot. Please /add a channel first."
+msgstr "你還沒有將任何頻道添加至這個機器人，快使用 /add 添加一個吧。"
+
+#: ../main.py:208
+msgid "Select a channel to search:"
+msgstr "選擇一個頻道："
+
+#: ../main.py:221
+msgid "Sorry, you don't have the permission to access this channel."
+msgstr "很抱歉，你沒有權限訪問此頻道。"
+
+#: ../main.py:229
+msgid "Now type in what you want to find in **{}**, or /cancel to quit."
+msgstr "請輸入你要搜索的內容，或使用 /cancel 退出。"
+
+#: ../main.py:243
+msgid "No results."
+msgstr "未找到結果。"
+
+#: ../main.py:267
+msgid "Follow Telegram settings"
+msgstr "跟隨 Telegram 設置"
+
+#: ../main.py:274
+msgid "Select your language:"
+msgstr "選擇你的語言："
+
+#: ../main.py:304
+msgid ""
+"/add - Add a channel to the bot\n"
+"/find - Find in a channel\n"
+"/cancel - Cancel or quit current operation\n"
+"/lang - Set bot language\n"
+"\n"
+"Use `/help [command]` to view help about a specific command."
+msgstr ""
+"/add - 添加一個頻道\n"
+"/find - 在一個頻道中搜索\n"
+"/cancel - 取消當前操作\n"
+"/lang - 設置機器人的界面語言\n"
+"使用 `/help [命令]` 以查看某個具體命令的幫助。"
+
+#: ../main.py:314
+msgid ""
+"**Usage**:\n"
+"    `/add`\n"
+"\n"
+"Add a channel to the bot"
+msgstr ""
+"**用法**：\n"
+"`    /add`\n"
+"\n"
+"添加一個頻道"
+
+#: ../main.py:316
+msgid ""
+"**Usage**:\n"
+"    `/find`\n"
+"\n"
+"Find in a channel"
+msgstr ""
+"**用法**：\n"
+"    `/find`\n"
+"\n"
+"在一個頻道中搜索"
+
+#: ../main.py:319
+msgid ""
+"**Usage**:\n"
+"    `/cancel`\n"
+"\n"
+"Cancel or quit current operation"
+msgstr ""
+"**用法**：\n"
+"    `/cancel`\n"
+"\n"
+"取消當前操作"
+
+#: ../main.py:321
+msgid ""
+"**Usage**:\n"
+"    `/lang`\n"
+"\n"
+"Set bot language"
+msgstr ""
+"**用法**：\n"
+"    `/lang`\n"
+"\n"
+"設置機器人的界面語言"
+
+#: ../main.py:323
+msgid "Command not found: `/{}`"
+msgstr "`/{}` 命令不存在"
