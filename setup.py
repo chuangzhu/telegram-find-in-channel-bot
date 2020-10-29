@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 
+# TODO: add readme
 setup(name='telegram-find-in-channel-bot',
       version='0.2.0',
       author='Zhu Chuang',

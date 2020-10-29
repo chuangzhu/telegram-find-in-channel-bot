@@ -2,14 +2,15 @@ import sqlite3
 import os
 import re
 from telethon.tl import types
+from typing import List
 from . import states
 
 
 class Database:
     def __init__(self, dbpath):
         conn = sqlite3.connect(dbpath)
-        conn.create_function('REGEXP', 2,
-                             lambda p, s: re.search(p, s) is not None)
+        conn.create_function('REGEXP',
+                             2, lambda p, s: re.search(p, s) is not None)
         cursor = conn.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS channels (
@@ -87,14 +88,14 @@ class Database:
             'INSERT INTO channels_admins (channel_id, user_id) VALUES (?, ?)',
             (channel_id, admin.id))
 
-    def get_user_owned_channels(self, user: types.User):
+    def get_user_owned_channels(self, user: types.User) -> List[int]:
         self.cursor.execute(
             'SELECT channel_id FROM channels_admins WHERE user_id = ?',
             (user.id, ))
         sqlresult = self.cursor.fetchall()
         return [x[0] for x in sqlresult]
 
-    def get_channel_admins(self, channel_id: types.Channel):
+    def get_channel_admins(self, channel_id: int):
         self.cursor.execute(
             'SELECT user_id FROM channels_admins WHERE channel_id = ?',
             (channel_id, ))
@@ -102,10 +103,31 @@ class Database:
         # Return ids only
         return map(lambda x: x[0], sqlresult)
 
+    def is_channel_admins(self, user: types.User, channel_id: int) -> bool:
+        return user.id in self.get_channel_admins(channel_id)
+
     def get_channel_title(self, channel_id: int):
         self.cursor.execute('SELECT title FROM channels WHERE channel_id = ?',
                             (channel_id, ))
         return self.cursor.fetchone()[0]
+
+    def get_channel_name(self, channel_id: int):
+        self.cursor.execute(
+            'SELECT username FROM channels WHERE channel_id = ?',
+            (channel_id, ))
+        return self.cursor.fetchone()[0]
+
+    def find_user_owned_channel_with_title(self, user: types.User, pattern: str) -> int:
+        self.cursor.execute(
+            """
+            SELECT channel_id FROM channels
+            WHERE channel_id IN (
+                SELECT channel_id FROM channels_admins WHERE user_id = ?
+            ) AND title LIKE ?
+            ORDER BY title
+            """, (user.id, f'%{pattern}%'))
+        sqlresult = self.cursor.fetchall()
+        return sqlresult
 
     def save_message(self, message: types.Message):
         if not isinstance(message, types.Message):

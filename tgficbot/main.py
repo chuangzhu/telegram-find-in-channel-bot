@@ -7,6 +7,7 @@ from telethon.errors.rpcerrorlist import ChannelPrivateError
 
 import os
 import re
+import shlex
 import signal
 from pathlib import Path
 import logging
@@ -19,14 +20,16 @@ from .db import Database
 from . import i18n
 
 argp = argparse.ArgumentParser(description='Start Telegram FindInChannelBot.')
-argp.add_argument('--config',
-                  type=str,
-                  default=os.path.expanduser('~/.config/tgficbot.cfg'),
-                  help='specify config file')
-argp.add_argument('--dbpath',
-                  type=str,
-                  default=os.path.expanduser('~/.cache/'),
-                  help='specify directory to store databases')
+argp.add_argument(
+    '--config',
+    type=str,
+    default=os.path.expanduser('~/.config/tgficbot.cfg'),
+    help='specify config file')
+argp.add_argument(
+    '--dbpath',
+    type=str,
+    default=os.path.expanduser('~/.cache/'),
+    help='specify directory to store databases')
 args = argp.parse_args()
 
 db = Database(Path(args.dbpath) / 'tgficbot.db')
@@ -123,21 +126,54 @@ async def adding_forward_handler(event: NewMessage.Event, strings):
     db.clear_user_state(user)
 
 
-find_command_parser = argparse.ArgumentParser()
-find_command_parser.add_argument('channel')
-find_command_parser.add_argument('pattern')
-find_command_parser.add_argument('-r', '--regex', action='store_true')
-find_command_parser.error = lambda m: None
+@bot.on(NewMessage(pattern=r'^/find +(.+)'))
+@onstate(states.Empty)
+@withi18n
+async def arged_find_command_handler(event: NewMessage.Event, strings):
+    """Find a pattern in a channel using a CLI-like syntax"""
+    raw_args = event.pattern_match.group(1)
+    try:
+        args = shlex.split(raw_args)
+    except ValueError:
+        await event.respond(
+            'Invalid command, use `/help find` for more information')
+        return
+    argch = args[0]
+    pattern = ' '.join(args[1:])
+
+    user = await event.get_chat()
+    channel_ids = db.get_user_owned_channels(user)
+    # Find in channels names, then channel titles. The priority matters.
+    channel_desciptors = [(db.get_channel_name(id_), id_) for id_ in channel_ids] + \
+                         [(db.get_channel_title(id_), id_) for id_ in channel_ids]
+    # Remove empty channel username
+    channel_desciptors = list(filter(lambda d: d[0], channel_desciptors))
+    print(channel_desciptors)
+    matched_ids = [k for v, k in channel_desciptors if pattern in v]
+    # Remove duplicates
+    matched_ids = list(dict.fromkeys(matched_ids))
+
+    if not len(matched_ids):
+        await event.respond('No such channel: ' + argch)
+        return
+    if len(matched_ids) > 1:
+        await event.respond(
+            'Multiple channels matched, searching in **{}**'.format(
+                db.get_channel_title(matched_ids[0])))
+
+    found_message_ids = db.find_in_messages(matched_ids[0], pattern)
+    if not len(found_message_ids):
+        await event.respond(strings.find_no_result)
+        return
+    for message_id in found_message_ids:
+        await bot.forward_messages(user, message_id, matched_ids[0])
 
 
-@bot.on(NewMessage(pattern=r'/find ?(.*?)'))
+@bot.on(NewMessage(pattern=r'^/find$'))
 @onstate(states.Empty)
 @withi18n
 async def find_command_handler(event: NewMessage.Event, strings):
-    raw_args = event.pattern_match.group(1)
-    if raw_args:
-        parsed_args = find_command_parser.parse_known_args(re.split('\s+', raw_args))
-        # TODO: find with re directly
+    """Finding interactively"""
     if not event.is_private:
         await event.respond(strings.private_only)
         return
