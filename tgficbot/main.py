@@ -14,6 +14,7 @@ import logging
 import asyncio
 import argparse
 import configparser
+from typing import List
 
 from . import states
 from .db import Database
@@ -181,6 +182,13 @@ async def arged_find_command_handler(event: NewMessage.Event, _):
         await bot.forward_messages(user, message_id, channel_id)
 
 
+def three_buttons_each_line(buttons: List[Button]) -> List[List[Button]]:
+    res = []
+    for i in range(0, len(buttons), 3):
+        res.append(buttons[i:i + 3])
+    return res
+
+
 @bot.on(NewMessage(pattern=r'^/find$'))
 @onstate(states.Empty)
 @withi18n
@@ -205,6 +213,7 @@ async def find_command_handler(event: NewMessage.Event, _):
         return Button.inline(channel_title, data=channel_id)
 
     buttons = list(map(channel_id2button, user_owned_channel_ids))
+    buttons = three_buttons_each_line(buttons)
     await event.respond(_('Select a channel to search:'), buttons=buttons)
     db.set_user_state(user, states.SelectingAChannelToFind)
 
@@ -264,12 +273,13 @@ async def channel_messageedited_handler(event: MessageEdited.Event):
 @withi18n
 async def lang_command_handler(event: NewMessage.Event, _):
     user = await event.get_chat()
-    buttons = [[Button.inline(_('Follow Telegram settings'), data='follow')]]
-    for i in range(0, len(i18n.translates), 3):
-        buttons.append([
-            Button.inline(i18n.languages[langcode], data=langcode)
-            for langcode in list(i18n.langcodes)[i:i + 3]
-        ])
+    buttons = [
+        Button.inline(i18n.languages[code], data=code)
+        for code in i18n.langcodes
+    ]
+    buttons = three_buttons_each_line(buttons)
+    buttons.insert(
+        0, [Button.inline(_('Follow Telegram settings'), data='follow')])
     db.set_user_state(user, states.SettingLang)
     await event.respond(_('Select your language:'), buttons=buttons)
 
