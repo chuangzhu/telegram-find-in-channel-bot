@@ -5,19 +5,21 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-10-30 06:55+0800\n"
+"POT-Creation-Date: 2020-10-30 13:24+0800\n"
 "PO-Revision-Date: 2020-10-30 07:00+0800\n"
 "Last-Translator: Zhu Chuang <genelocated@yandex.com>\n"
 "Language-Team: Language zh-hant\n"
+"Language: 正體中文\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
-"Language: zh-hant\n"
 
 #: ../main.py:57 ../main.py:290
 msgid "Hi! To /find in your channel, you must /add it to this bot first."
-msgstr "你好！請先使用 /add 命令將你的頻道添加至這個機器人，然後就可以使用 /find 進行搜索啦。"
+msgstr ""
+"你好！請先使用 /add 命令將你的頻道添加至這個機器人，然後就可以使用 /find 進行"
+"搜索啦。"
 
 #: ../main.py:69
 msgid ""

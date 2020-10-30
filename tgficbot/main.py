@@ -268,7 +268,7 @@ async def lang_command_handler(event: NewMessage.Event, _):
     for i in range(0, len(i18n.translates), 3):
         buttons.append([
             Button.inline(i18n.languages[langcode], data=langcode)
-            for langcode in list(i18n.translates.keys())[i:i + 3]
+            for langcode in list(i18n.langcodes)[i:i + 3]
         ])
     db.set_user_state(user, states.SettingLang)
     await event.respond(_('Select your language:'), buttons=buttons)
@@ -279,7 +279,7 @@ async def lang_command_handler(event: NewMessage.Event, _):
 async def setting_lang_handler(event: CallbackQuery.Event):
     user = await event.get_chat()
     langcode = event.data.decode()
-    if (langcode not in i18n.languages) and (langcode != 'follow'):
+    if (langcode not in i18n.langcodes) and (langcode != 'follow'):
         await event.respond('Unsupported language selected.')
         return
     db.set_user_lang(user.id, langcode)

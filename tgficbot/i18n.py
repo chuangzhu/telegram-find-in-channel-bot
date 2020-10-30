@@ -1,14 +1,17 @@
 import os
 import gettext
-from .. import db
+from . import db
 
-LOCALEDIR = os.path.join(os.path.dirname(__file__), '..', 'locales')
-languages = ['en', 'zh-hans', 'zh-hant']
+LOCALEDIR = os.path.join(os.path.dirname(__file__), 'locales')
+langcodes = [
+    f for f in os.listdir(LOCALEDIR)
+    if os.path.isdir(os.path.join(LOCALEDIR, f))
+]
 translates = {
-    'en': gettext.translation('tgficbot', LOCALEDIR, languages=['en']),
-    'zh-hans': gettext.translation('tgficbot', LOCALEDIR, languages=['zh-hans']),
-    'zh-hant': gettext.translation('tgficbot', LOCALEDIR, languages=['zh-hant']),
+    lang: gettext.translation('main', LOCALEDIR, [lang])
+    for lang in langcodes
 }
+languages = {lang: translates[lang].info()['language'] for lang in langcodes}
 
 
 def I18nHandler(database: db.Database):
@@ -23,12 +26,12 @@ def I18nHandler(database: db.Database):
 
             # When a user /start the bot for the 1st time
             if database.get_user_state(user) is None:
-                return await func(event=event, strings=translate_telegram)
+                return await func(event=event, _=translate_telegram.gettext)
 
             db_lang = database.get_user_lang(user.id)
             if db_lang in ['follow', None]:
-                return await func(event=event, _=translate_telegram)
-            return await func(event=event, _=translates[db_lang])
+                return await func(event=event, _=translate_telegram.gettext)
+            return await func(event=event, _=translates[db_lang].gettext)
 
         return wrapper
 

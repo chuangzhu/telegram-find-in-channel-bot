@@ -1,25 +1,24 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR ORGANIZATION
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# English translations for PACKAGE package.
+# Copyright (C) 2020 ORGANIZATION
+# Zhu Chuang <genelocated@yandex.com>, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2020-10-30 13:24+0800\n"
-"PO-Revision-Date: 2020-10-30 06:32+0800\n"
+"PO-Revision-Date: 2020-10-30 08:21+0800\n"
 "Last-Translator: Zhu Chuang <genelocated@yandex.com>\n"
-"Language-Team: Language zh-hans\n"
-"Language: 简体中文\n"
+"Language-Team: English\n"
+"Language: English\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../main.py:57 ../main.py:290
 msgid "Hi! To /find in your channel, you must /add it to this bot first."
-msgstr ""
-"你好！请先使用 /add 命令将你的频道添加至这个机器人，然后就可以使用 /find 进行"
-"搜索啦。"
+msgstr "Hi! To /find in your channel, you must /add it to this bot first."
 
 #: ../main.py:69
 msgid ""
@@ -28,89 +27,92 @@ msgid ""
 "1. Add this bot to your channel as an admin;\n"
 "2. Forward a message from the channel to me."
 msgstr ""
-"要添加你的频道，请：\n"
+"To add your channel, do the following:\n"
 "\n"
-"1. 将这个机器人作为管理员添加至你的频道；\n"
-"2. 将你的频道中的一条信息转发给我。"
+"1. Add this bot to your channel as an admin;\n"
+"2. Forward a message from the channel to me."
 
 #: ../main.py:86
 msgid "Aborted."
-msgstr "已取消。"
+msgstr "Aborted."
 
 #: ../main.py:97
 msgid ""
 "Please forward any message from your channel to me, or /cancel to abort."
-msgstr "请将你的频道中任意一条消息转发给我，或使用 /cancel 来取消。"
+msgstr ""
+"Please forward any message from your channel to me, or /cancel to abort."
 
 #: ../main.py:101
 msgid "Please forward from a channel."
-msgstr "请从一个频道转发。"
+msgstr "Please forward from a channel."
 
 #: ../main.py:104
 msgid "Getting channel infos..."
-msgstr "正在获取频道信息..."
+msgstr "Getting channel infos..."
 
 #: ../main.py:109 ../main.py:115
 msgid ""
 "Please add this bot to your channel before you forward me channel messages."
-msgstr "请先完成第一步：将机器人添加至你的频道。"
+msgstr ""
+"Please add this bot to your channel before you forward me channel messages."
 
 #: ../main.py:119
 msgid "Channel already added. Abort."
-msgstr "频道已添加。"
+msgstr "Channel already added. Abort."
 
 #: ../main.py:130
 msgid "Obtaining previous messages..."
-msgstr "正在获取以往的频道消息..."
+msgstr "Obtaining previous messages..."
 
 #: ../main.py:136
 msgid "Add finished."
-msgstr "频道已添加。"
+msgstr "Add finished."
 
 #: ../main.py:150
 msgid "Invalid command, use `/help find` for more information"
-msgstr ""
+msgstr "Invalid command, use `/help find` for more information"
 
 #: ../main.py:161 ../main.py:168
 msgid "No such channel: **{}**"
-msgstr ""
+msgstr "No such channel: **{}**"
 
 #: ../main.py:172
 msgid "Multiple channels matched, finding in **{}**"
-msgstr ""
+msgstr "Multiple channels matched, finding in **{}**"
 
 #: ../main.py:191
 msgid "This command can only be used in private chat."
-msgstr "该命令只能在与机器人私聊时使用。"
+msgstr "This command can only be used in private chat."
 
 #: ../main.py:199
 msgid ""
 "You haven't had any channel added to this bot. Please /add a channel first."
-msgstr "你还没有将任何频道添加至这个机器人，快使用 /add 添加一个吧。"
+msgstr ""
+"You haven't had any channel added to this bot. Please /add a channel first."
 
 #: ../main.py:208
 msgid "Select a channel to search:"
-msgstr "选择一个频道："
+msgstr "Select a channel to search:"
 
 #: ../main.py:221
 msgid "Sorry, you don't have the permission to access this channel."
-msgstr "很抱歉，你没有权限访问此频道。"
+msgstr "Sorry, you don't have the permission to access this channel."
 
 #: ../main.py:229
 msgid "Now type in what you want to find in **{}**, or /cancel to quit."
-msgstr "请输入你要搜索的内容，或使用 /cancel 退出。"
+msgstr "Now type in what you want to find in **{}**, or /cancel to quit."
 
 #: ../main.py:243
 msgid "No results."
-msgstr "未找到结果。"
+msgstr "No results."
 
 #: ../main.py:267
 msgid "Follow Telegram settings"
-msgstr "跟随 Telegram 设置"
+msgstr "Follow Telegram settings"
 
 #: ../main.py:274
 msgid "Select your language:"
-msgstr "选择你的语言："
+msgstr "Select your language:"
 
 #: ../main.py:304
 msgid ""
@@ -121,12 +123,12 @@ msgid ""
 "\n"
 "Use `/help [command]` to view help about a specific command."
 msgstr ""
-"/add - 添加一个频道\n"
-"/find - 在一个频道中搜索\n"
-"/cancel - 取消当前操作\n"
-"/lang - 设置机器人的界面语言\n"
+"/add - Add a channel to the bot\n"
+"/find - Find in a channel\n"
+"/cancel - Cancel or quit current operation\n"
+"/lang - Set bot language\n"
 "\n"
-"使用 `/help [命令]` 以查看某个具体命令的帮助。"
+"Use `/help [command]` to view help about a specific command."
 
 #: ../main.py:314
 msgid ""
@@ -135,10 +137,10 @@ msgid ""
 "\n"
 "Add a channel to the bot"
 msgstr ""
-"**用法**：\n"
-"`    /add`\n"
+"**Usage**:\n"
+"    `/add`\n"
 "\n"
-"添加一个频道"
+"Add a channel to the bot"
 
 #: ../main.py:316
 msgid ""
@@ -147,10 +149,10 @@ msgid ""
 "\n"
 "Find in a channel"
 msgstr ""
-"**用法**：\n"
+"**Usage**:\n"
 "    `/find`\n"
 "\n"
-"在一个频道中搜索"
+"Find in a channel"
 
 #: ../main.py:319
 msgid ""
@@ -159,10 +161,10 @@ msgid ""
 "\n"
 "Cancel or quit current operation"
 msgstr ""
-"**用法**：\n"
+"**Usage**:\n"
 "    `/cancel`\n"
 "\n"
-"取消当前操作"
+"Cancel or quit current operation"
 
 #: ../main.py:321
 msgid ""
@@ -171,11 +173,11 @@ msgid ""
 "\n"
 "Set bot language"
 msgstr ""
-"**用法**：\n"
+"**Usage**:\n"
 "    `/lang`\n"
 "\n"
-"设置机器人的界面语言"
+"Set bot language"
 
 #: ../main.py:323
 msgid "Command not found: `/{}`"
-msgstr "`/{}` 命令不存在"
+msgstr "Command not found: `/{}`"
