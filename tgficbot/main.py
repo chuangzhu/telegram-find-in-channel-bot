@@ -97,13 +97,13 @@ async def adding_forward_handler(event: NewMessage.Event, _):
             _('Please forward any message from your channel to me, '
               'or /cancel to abort.'))
         return
-    if event.message.fwd_from.channel_id is None:
+    if event.message.fwd_from.channel_post is None:
         await event.respond(_('Please forward from a channel.'))
         return
 
     await event.respond(_('Getting channel infos...'))
     try:
-        channel = await bot.get_entity(event.message.fwd_from.channel_id)
+        channel = await bot.get_entity(event.message.fwd_from.from_id)
     except ChannelPrivateError:
         await event.respond(
             _('Please add this bot to your channel before you forward me channel messages.'
@@ -127,9 +127,11 @@ async def adding_forward_handler(event: NewMessage.Event, _):
 
     full_channel = await bot(
         functions.channels.GetFullChannelRequest(channel=channel))
+    print(full_channel)
     await event.respond(_('Obtaining previous messages...'))
     for i in range(full_channel.full_chat.read_inbox_max_id):
         message = await bot.get_messages(channel, ids=i)
+        print(message)
         db.save_message(message)
 
     db.conn.commit()
@@ -238,22 +240,24 @@ async def select_channel_to_find_handler(event: CallbackQuery.Event, _):
         format(channel_title))
 
 
-def get_showmore_buttons(shown: int, total: int):
-    """shown: starts from 10, end with total
+def get_showmore_buttons(start: int, total: int):
+    """start: begin with 0
     """
-    previous_shown = (shown - constants.MessagesEachSearch
-                      ) if shown > constants.MessagesEachSearch else shown
-    next_shown = (shown + constants.MessagesEachSearch
-                  ) if shown + constants.MessagesEachSearch <= total else total
+    previous_start = max((start - constants.MessagesEachSearch), 0)
+    next_start = min((start + constants.MessagesEachSearch), total)
     button_left = Button.inline(
-        '⇦', data=constants.FindingShowMore.format(to=previous_shown))
+        '⇦', data=constants.FindingShowMore.format(start=previous_start))
     button_right = Button.inline(
-        '⇨', data=constants.FindingShowMore.format(to=next_shown))
-    button_shown = Button.inline(f'{shown} / {total}')
-    if shown <= constants.MessagesEachSearch:
+        '⇨', data=constants.FindingShowMore.format(start=next_start))
+    button_shown = Button.inline(f'{start + constants.MessagesEachSearch} / {total}')
+    # MessagesEachSearch/total ⇨
+    if start == 0:
         return [button_shown, button_right]
-    if shown >= total:
+    # ⇦ total/total
+    if start + constants.MessagesEachSearch >= total:
+        button_shown = Button.inline(f'{total} / {total}')
         return [button_left, button_shown]
+    # ⇦ start+MessagesEachSearch/total ⇨
     return [button_left, button_shown, button_right]
 
 
@@ -275,11 +279,12 @@ async def finding_handler(event: NewMessage.Event, _):
         return
 
     # If there are too many matches to be shown on once
+    for i in range(constants.MessagesEachSearch):
+        await bot.forward_messages(user, found_message_ids[i], channel_id)
     await event.respond(
         _('Only {} results are shown, click the buttons below for more.'.
           format(constants.MessagesEachSearch)),
-        buttons=get_showmore_buttons(constants.MessagesEachSearch,
-                                     len(found_message_ids)),
+        buttons=get_showmore_buttons(start=0, total=len(found_message_ids)),
     )
 
 
@@ -292,10 +297,18 @@ async def finding_showmore_handler(event: CallbackQuery.Event, _):
     data = event.data.decode()
     if not data.startswith(constants.FindingShowMorePrefix):
         return
-    to_shown = data.split(':')[1]
     pattern = db.get_latest_search(user.id)
     found_message_ids = db.find_in_messages(channel_id, pattern)
-    return
+    id_start = int(data.split(':')[1])
+
+    for i in range(id_start, id_start + constants.MessagesEachSearch):
+        await bot.forward_messages(user, found_message_ids[i], channel_id)
+    await event.respond(
+        _('Only {} results are shown, click the buttons below for more.'.
+          format(constants.MessagesEachSearch)),
+        buttons=get_showmore_buttons(start=id_start,
+                                     total=len(found_message_ids)),
+    )
 
 
 @bot.on(NewMessage())

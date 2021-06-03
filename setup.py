@@ -16,7 +16,7 @@ setup(
     author_email='genelocated@yandex.com',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=['telethon>=1.9.0'],
+    install_requires=['telethon==1.21.1'],
     python_requires='>=3.7',  # We used some f-strings here
     entry_points={
         'console_scripts':

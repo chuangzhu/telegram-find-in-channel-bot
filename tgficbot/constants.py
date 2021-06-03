@@ -1,4 +1,4 @@
 
 MessagesEachSearch = 10
 FindingShowMorePrefix = 'finding_showmore'
-FindingShowMore = FindingShowMorePrefix + ':{to}'
+FindingShowMore = FindingShowMorePrefix + ':{start}'
