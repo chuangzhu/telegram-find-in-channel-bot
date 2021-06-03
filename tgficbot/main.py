@@ -127,11 +127,9 @@ async def adding_forward_handler(event: NewMessage.Event, _):
 
     full_channel = await bot(
         functions.channels.GetFullChannelRequest(channel=channel))
-    print(full_channel)
     await event.respond(_('Obtaining previous messages...'))
     for i in range(full_channel.full_chat.read_inbox_max_id):
         message = await bot.get_messages(channel, ids=i)
-        print(message)
         db.save_message(message)
 
     db.conn.commit()
@@ -245,11 +243,13 @@ def get_showmore_buttons(start: int, total: int):
     """
     previous_start = max((start - constants.MessagesEachSearch), 0)
     next_start = min((start + constants.MessagesEachSearch), total)
+    # print(previous_start, next_start)
     button_left = Button.inline(
         '⇦', data=constants.FindingShowMore.format(start=previous_start))
     button_right = Button.inline(
         '⇨', data=constants.FindingShowMore.format(start=next_start))
-    button_shown = Button.inline(f'{start + constants.MessagesEachSearch} / {total}')
+    button_shown = Button.inline(
+        f'{start + constants.MessagesEachSearch} / {total}')
     # MessagesEachSearch/total ⇨
     if start == 0:
         return [button_shown, button_right]
@@ -279,6 +279,7 @@ async def finding_handler(event: NewMessage.Event, _):
         return
 
     # If there are too many matches to be shown on once
+    db.set_latest_search(user.id, pattern)
     for i in range(constants.MessagesEachSearch):
         await bot.forward_messages(user, found_message_ids[i], channel_id)
     await event.respond(
@@ -300,8 +301,10 @@ async def finding_showmore_handler(event: CallbackQuery.Event, _):
     pattern = db.get_latest_search(user.id)
     found_message_ids = db.find_in_messages(channel_id, pattern)
     id_start = int(data.split(':')[1])
+    id_end = min(id_start + constants.MessagesEachSearch, len(found_message_ids))
+    # print(id_start, id_end)
 
-    for i in range(id_start, id_start + constants.MessagesEachSearch):
+    for i in range(id_start, id_end):
         await bot.forward_messages(user, found_message_ids[i], channel_id)
     await event.respond(
         _('Only {} results are shown, click the buttons below for more.'.
