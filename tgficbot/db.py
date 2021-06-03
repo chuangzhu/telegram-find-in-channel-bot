@@ -13,8 +13,8 @@ def first_fetchall(sqlresult: List[tuple]):
 class Database:
     def __init__(self, dbpath):
         conn = sqlite3.connect(dbpath)
-        conn.create_function('REGEXP',
-                             2, lambda p, s: re.search(p, s) is not None)
+        conn.create_function('REGEXP', 2,
+                             lambda p, s: re.search(p, s) is not None)
         cursor = conn.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS channels (
@@ -37,6 +37,7 @@ class Database:
                 username TEXT,
                 state INTEGER NOT NULL,
                 selected_id INTEGER,
+                latest_search INTEGER,
                 lang TEXT DEFAULT follow NOT NULL
             );
         """)
@@ -52,6 +53,10 @@ class Database:
         except sqlite3.OperationalError:
             cursor.execute(
                 'ALTER TABLE users ADD lang TEXT DEFAULT follow NOT NULL')
+        try:
+            cursor.execute('SELECT latest_search FROM users')
+        except sqlite3.OperationalError:
+            cursor.execute('ALTER TABLE users ADD search_page INTEGER')
         self.conn = conn
         self.cursor = cursor
 
@@ -131,17 +136,18 @@ class Database:
             ORDER BY {0}
         """
         # Find in channels names, then channel titles. The priority matters.
-        self.cursor.execute(
-            sqlquery.format('username'), (user.id, f'%{pattern}%'))
+        self.cursor.execute(sqlquery.format('username'),
+                            (user.id, f'%{pattern}%'))
         matched_ids = first_fetchall(self.cursor.fetchall())
-        self.cursor.execute(
-            sqlquery.format('title'), (user.id, f'%{pattern}%'))
+        self.cursor.execute(sqlquery.format('title'),
+                            (user.id, f'%{pattern}%'))
         matched_ids += first_fetchall(self.cursor.fetchall())
         # Remove duplicates
         matched_ids = list(dict.fromkeys(matched_ids))
         return matched_ids
 
-    def get_channel_id_from_name(self, user: types.User, channel_name: str) -> int:
+    def get_channel_id_from_name(self, user: types.User,
+                                 channel_name: str) -> int:
         self.cursor.execute(
             """
             SELECT channel_id FROM channels
@@ -216,3 +222,12 @@ class Database:
         self.cursor.execute('SELECT lang FROM users WHERE user_id=?',
                             (user_id, ))
         return self.cursor.fetchone()[0]
+
+    def get_latest_search(self, user_id: int):
+        self.cursor.execute('SELECT latest_search FROM users WHERE user_id=?',
+                            (user_id, ))
+        return self.cursor.fetchone()[0]
+
+    def set_latest_search(self, user_id: int, latest_search: str):
+        self.cursor.execute('UPDATE users SET latest_search=? WHERE user_id=?',
+                            (latest_search, user_id))

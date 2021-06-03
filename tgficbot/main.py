@@ -19,18 +19,17 @@ from typing import List
 from . import states
 from .db import Database
 from . import i18n
+from . import constants
 
 argp = argparse.ArgumentParser(description='Start Telegram FindInChannelBot.')
-argp.add_argument(
-    '--config',
-    type=str,
-    default=os.path.expanduser('~/.config/tgficbot.cfg'),
-    help='specify config file')
-argp.add_argument(
-    '--dbpath',
-    type=str,
-    default=os.path.expanduser('~/.cache/'),
-    help='specify directory to store databases')
+argp.add_argument('--config',
+                  type=str,
+                  default=os.path.expanduser('~/.config/tgficbot.cfg'),
+                  help='specify config file')
+argp.add_argument('--dbpath',
+                  type=str,
+                  default=os.path.expanduser('~/.cache/'),
+                  help='specify directory to store databases')
 args = argp.parse_args()
 
 db = Database(Path(args.dbpath) / 'tgficbot.db')
@@ -195,8 +194,8 @@ def three_buttons_each_line(buttons: List[Button]) -> List[List[Button]]:
 async def find_command_handler(event: NewMessage.Event, _):
     """Finding interactively"""
     if not event.is_private:
-        await event.respond(
-            _('This command can only be used in private chat.'))
+        await event.respond(_('This command can only be used in private chat.')
+                            )
         return
 
     user = await event.get_chat()
@@ -239,6 +238,25 @@ async def select_channel_to_find_handler(event: CallbackQuery.Event, _):
         format(channel_title))
 
 
+def get_showmore_buttons(shown: int, total: int):
+    """shown: starts from 10, end with total
+    """
+    previous_shown = (shown - constants.MessagesEachSearch
+                      ) if shown > constants.MessagesEachSearch else shown
+    next_shown = (shown + constants.MessagesEachSearch
+                  ) if shown + constants.MessagesEachSearch <= total else total
+    button_left = Button.inline(
+        '⇦', data=constants.FindingShowMore.format(to=previous_shown))
+    button_right = Button.inline(
+        '⇨', data=constants.FindingShowMore.format(to=next_shown))
+    button_shown = Button.inline(f'{shown} / {total}')
+    if shown <= constants.MessagesEachSearch:
+        return [button_shown, button_right]
+    if shown >= total:
+        return [button_left, button_shown]
+    return [button_left, button_shown, button_right]
+
+
 @bot.on(NewMessage())
 @onstate(states.FindingInAChannel)
 @withi18n
@@ -251,8 +269,33 @@ async def finding_handler(event: NewMessage.Event, _):
     if len(found_message_ids) == 0:
         await event.respond(_('No results.'))
         return
-    for message_id in found_message_ids:
-        await bot.forward_messages(user, message_id, channel_id)
+    if len(found_message_ids) <= constants.MessagesEachSearch:
+        for message_id in found_message_ids:
+            await bot.forward_messages(user, message_id, channel_id)
+        return
+
+    # If there are too many matches to be shown on once
+    await event.respond(
+        _('Only {} results are shown, click the buttons below for more.'.
+          format(constants.MessagesEachSearch)),
+        buttons=get_showmore_buttons(constants.MessagesEachSearch,
+                                     len(found_message_ids)),
+    )
+
+
+@bot.on(CallbackQuery())
+@onstate(states.FindingInAChannel)
+@withi18n
+async def finding_showmore_handler(event: CallbackQuery.Event, _):
+    user = await event.get_chat()
+    channel_id = db.get_user_selected(user.id)
+    data = event.data.decode()
+    if not data.startswith(constants.FindingShowMorePrefix):
+        return
+    to_shown = data.split(':')[1]
+    pattern = db.get_latest_search(user.id)
+    found_message_ids = db.find_in_messages(channel_id, pattern)
+    return
 
 
 @bot.on(NewMessage())
