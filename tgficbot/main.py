@@ -356,8 +356,11 @@ async def lang_command_handler(event: NewMessage.Event, _):
         for code in i18n.langcodes
     ]
     buttons = three_buttons_each_line(buttons)
-    buttons.insert(
-        0, [Button.inline(_('Follow Telegram settings'), data='follow')])
+    # The follow button take a whole line
+    buttons.insert(0, [
+        Button.inline(_('Follow Telegram settings'),
+                      data=constants.CQ.SetLang.format(langcode='follow'))
+    ])
     db.set_user_state(user, states.SettingLang)
     await event.respond(_('Select your language:'), buttons=buttons)
 
