@@ -37,7 +37,7 @@ class Database:
                 username TEXT,
                 state INTEGER NOT NULL,
                 selected_id INTEGER,
-                latest_search INTEGER,
+                latest_search TEXT,
                 lang TEXT DEFAULT follow NOT NULL
             );
         """)
@@ -56,7 +56,7 @@ class Database:
         try:
             cursor.execute('SELECT latest_search FROM users')
         except sqlite3.OperationalError:
-            cursor.execute('ALTER TABLE users ADD search_page INTEGER')
+            cursor.execute('ALTER TABLE users ADD latest_search TEXT')
         self.conn = conn
         self.cursor = cursor
 
@@ -231,3 +231,6 @@ class Database:
     def set_latest_search(self, user_id: int, latest_search: str):
         self.cursor.execute('UPDATE users SET latest_search=? WHERE user_id=?',
                             (latest_search, user_id))
+
+    def clear_latest_search(self, user_id: int):
+        self.set_latest_search(user_id, None)

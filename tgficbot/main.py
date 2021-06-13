@@ -12,6 +12,7 @@ import signal
 from pathlib import Path
 import logging
 import asyncio
+import hashlib
 import argparse
 import configparser
 from typing import List
@@ -238,16 +239,20 @@ async def select_channel_to_find_handler(event: CallbackQuery.Event, _):
         format(channel_title))
 
 
-def get_showmore_buttons(start: int, total: int):
+def get_showmore_buttons(search: str, start: int, total: int):
     """start: begin with 0
     """
+    digest = hashlib.md5(search.encode()).hexdigest()
     previous_start = max((start - constants.MessagesEachSearch), 0)
     next_start = min((start + constants.MessagesEachSearch), total)
     # print(previous_start, next_start)
-    button_left = Button.inline(
-        '⇦', data=constants.FindingShowMore.format(start=previous_start))
-    button_right = Button.inline(
-        '⇨', data=constants.FindingShowMore.format(start=next_start))
+    fsm = constants.CQ.FindShowMore
+    button_left = Button.inline('⇦',
+                                data=fsm.format(digest=digest,
+                                                start=previous_start))
+    button_right = Button.inline('⇨',
+                                 data=fsm.format(digest=digest,
+                                                 start=next_start))
     button_shown = Button.inline(
         f'{start + constants.MessagesEachSearch} / {total}')
     # MessagesEachSearch/total ⇨
@@ -285,7 +290,9 @@ async def finding_handler(event: NewMessage.Event, _):
     await event.respond(
         _('Only {} results are shown, click the buttons below for more.'.
           format(constants.MessagesEachSearch)),
-        buttons=get_showmore_buttons(start=0, total=len(found_message_ids)),
+        buttons=get_showmore_buttons(search=pattern,
+                                     start=0,
+                                     total=len(found_message_ids)),
     )
 
 
@@ -293,15 +300,21 @@ async def finding_handler(event: NewMessage.Event, _):
 @onstate(states.FindingInAChannel)
 @withi18n
 async def finding_showmore_handler(event: CallbackQuery.Event, _):
-    user = await event.get_chat()
-    channel_id = db.get_user_selected(user.id)
     data = event.data.decode()
-    if not data.startswith(constants.FindingShowMorePrefix):
+    if not data.startswith(constants.CQ.FindShowMorePrefix):
         return
+    __, digest, id_start = data.split(':')
+    id_start = int(id_start)
+
+    user = await event.get_chat()
     pattern = db.get_latest_search(user.id)
+    # Just to make sure the button user clicks is in current search
+    if hashlib.md5(pattern.encode()).hexdigest() != digest:
+        return
+    channel_id = db.get_user_selected(user.id)
     found_message_ids = db.find_in_messages(channel_id, pattern)
-    id_start = int(data.split(':')[1])
-    id_end = min(id_start + constants.MessagesEachSearch, len(found_message_ids))
+    id_end = min(id_start + constants.MessagesEachSearch,
+                 len(found_message_ids))
     # print(id_start, id_end)
 
     for i in range(id_start, id_end):
@@ -309,7 +322,8 @@ async def finding_showmore_handler(event: CallbackQuery.Event, _):
     await event.respond(
         _('Only {} results are shown, click the buttons below for more.'.
           format(constants.MessagesEachSearch)),
-        buttons=get_showmore_buttons(start=id_start,
+        buttons=get_showmore_buttons(search=pattern,
+                                     start=id_start,
                                      total=len(found_message_ids)),
     )
 
