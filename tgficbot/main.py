@@ -210,7 +210,8 @@ async def find_command_handler(event: NewMessage.Event, _):
 
     def channel_id2button(channel_id):
         channel_title = db.get_channel_title(channel_id)
-        return Button.inline(channel_title, data=channel_id)
+        data = constants.CQ.SelectAChannelToFind.format(channel_id=channel_id)
+        return Button.inline(channel_title, data=data)
 
     buttons = list(map(channel_id2button, user_owned_channel_ids))
     buttons = three_buttons_each_line(buttons)
@@ -223,7 +224,10 @@ async def find_command_handler(event: NewMessage.Event, _):
 @withi18n
 async def select_channel_to_find_handler(event: CallbackQuery.Event, _):
     user = await event.get_chat()
-    channel_id = int(event.data)
+    data = event.data.decode()
+    if not data.startswith(constants.CQ.SelectAChannelToFindPrefix):
+        return
+    channel_id = int(data.split(':')[1])
 
     if user.id not in db.get_channel_admins(channel_id):
         await event.respond(
@@ -347,7 +351,8 @@ async def channel_messageedited_handler(event: MessageEdited.Event):
 async def lang_command_handler(event: NewMessage.Event, _):
     user = await event.get_chat()
     buttons = [
-        Button.inline(i18n.languages[code], data=code)
+        Button.inline(i18n.languages[code],
+                      data=constants.CQ.SetLang.format(langcode=code))
         for code in i18n.langcodes
     ]
     buttons = three_buttons_each_line(buttons)
@@ -361,7 +366,10 @@ async def lang_command_handler(event: NewMessage.Event, _):
 @onstate(states.SettingLang)
 async def setting_lang_handler(event: CallbackQuery.Event):
     user = await event.get_chat()
-    langcode = event.data.decode()
+    data = event.data.decode()
+    if not data.startswith(constants.CQ.SetLangPrefix):
+        return
+    langcode = data.split(':')[1]
     if (langcode not in i18n.langcodes) and (langcode != 'follow'):
         await event.respond('Unsupported language selected.')
         return
