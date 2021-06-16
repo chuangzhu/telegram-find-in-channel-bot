@@ -8,7 +8,7 @@ with open(path.join(here, 'README.md')) as f:
 
 setup(
     name='telegram-find-in-channel-bot',
-    version='0.3.0',
+    version='0.4.0',
     url='https://github.com/chuangzhu/telegram-find-in-channel-bot',
     long_description=long_description,
     long_description_content_type='text/markdown',
