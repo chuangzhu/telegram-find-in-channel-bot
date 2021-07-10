@@ -1,9 +1,11 @@
 import sqlite3
 import os
 import re
+import secrets
 from telethon.tl import types
 from typing import List
 from . import states
+from . import constants
 
 
 def first_fetchall(sqlresult: List[tuple]):
@@ -20,7 +22,8 @@ class Database:
             CREATE TABLE IF NOT EXISTS channels (
                 channel_id INTEGER PRIMARY KEY NOT NULL,
                 username TEXT,
-                title TEXT NOT NULL
+                title TEXT NOT NULL,
+                token TEXT
             );
         """)
         cursor.execute("""
@@ -57,6 +60,10 @@ class Database:
             cursor.execute('SELECT latest_search FROM users')
         except sqlite3.OperationalError:
             cursor.execute('ALTER TABLE users ADD latest_search TEXT')
+        try:
+            cursor.execute('SELECT token FROM channels')
+        except sqlite3.OperationalError:
+            cursor.execute('ALTER TABLE channels ADD token TEXT')
         self.conn = conn
         self.cursor = cursor
 
@@ -234,3 +241,11 @@ class Database:
 
     def clear_latest_search(self, user_id: int):
         self.set_latest_search(user_id, None)
+
+    def set_channel_token(self, channel_id: int) -> str:
+        """Generate search token for a channel"""
+        token = secrets.token_urlsafe(constants.SearchTokenLength)
+        self.cursor.execute(
+            'UPDATE channels SET token=? WHERE channel_id=?',
+            (token, channel_id, ))
+        return token

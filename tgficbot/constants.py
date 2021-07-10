@@ -15,3 +15,6 @@ class CQ:
 
     SetLangPrefix = 'sll'
     SetLang = SetLangPrefix + ':{langcode}'
+
+
+SearchTokenLength = 16

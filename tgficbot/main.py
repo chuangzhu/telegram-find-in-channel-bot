@@ -138,6 +138,7 @@ async def adding_forward_handler(event: NewMessage.Event, _):
     db.clear_user_state(user)
 
 
+# TODO: merge arged find and interactive find
 @bot.on(NewMessage(pattern=r'^/find +(.+)'))
 @onstate(states.Empty)
 @withi18n
@@ -189,6 +190,24 @@ def three_buttons_each_line(buttons: List[Button]) -> List[List[Button]]:
     return res
 
 
+def channel_id2button(channel_id: int):
+    channel_title = db.get_channel_title(channel_id)
+    data = constants.CQ.SelectAChannelToFind.format(channel_id=channel_id)
+    return Button.inline(channel_title, data=data)
+
+
+def channel_picker(event: NewMessage.Event, user: types.User, message: str, _):
+    user_owned_channel_ids = db.get_user_owned_channels(user)
+    if len(user_owned_channel_ids) == 0:
+        await event.respond(
+            _("You haven't had any channel added to this bot. Please /add a channel first."
+              ))
+        return
+    buttons = list(map(channel_id2button, user_owned_channel_ids))
+    buttons = three_buttons_each_line(buttons)
+    await event.respond(message, buttons=buttons)
+
+
 @bot.on(NewMessage(pattern=r'^/find$'))
 @onstate(states.Empty)
 @withi18n
@@ -200,22 +219,8 @@ async def find_command_handler(event: NewMessage.Event, _):
         return
 
     user = await event.get_chat()
-    user_owned_channel_ids = db.get_user_owned_channels(user)
-
-    if len(user_owned_channel_ids) == 0:
-        await event.respond(
-            _("You haven't had any channel added to this bot. Please /add a channel first."
-              ))
-        return
-
-    def channel_id2button(channel_id):
-        channel_title = db.get_channel_title(channel_id)
-        data = constants.CQ.SelectAChannelToFind.format(channel_id=channel_id)
-        return Button.inline(channel_title, data=data)
-
-    buttons = list(map(channel_id2button, user_owned_channel_ids))
-    buttons = three_buttons_each_line(buttons)
-    await event.respond(_('Select a channel to search:'), buttons=buttons)
+    message_text = _('Select a channel to search:')
+    channel_picker(event, user, message_text, _)
     db.set_user_state(user, states.SelectingAChannelToFind)
 
 
@@ -415,6 +420,11 @@ async def help_command_handler(event: NewMessage.Event, _):
         await event.respond(_('**Usage**:\n    `/lang`\n\nSet bot language'))
     else:
         await event.respond(_('Command not found: `/{}`').format(command))
+
+
+# TODO: /settoken
+async def settoken_command_handler(event: NewMessage.Event, _):
+    pass
 
 
 def sigterm_handler(num, frame):
