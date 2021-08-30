@@ -1,5 +1,4 @@
 import sqlite3
-import os
 import re
 import secrets
 from telethon.tl import types

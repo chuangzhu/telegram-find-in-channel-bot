@@ -124,3 +124,5 @@ dmypy.json
 .pyre/
 bot.session
 bot.session-journal
+tgficbot.cfg
+tgficbot.db

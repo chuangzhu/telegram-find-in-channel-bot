@@ -10,8 +10,8 @@ class CQ:
     FindShowMore = FindShowMorePrefix + ':{digest}:{start}'
 
     # TODO: also add prefixes for these callback queries
-    SelectAChannelToFindPrefix = 'scf'
-    SelectAChannelToFind = SelectAChannelToFindPrefix + ':{channel_id}'
+    SelectAChannelPrefix = 'scf'
+    SelectAChannel = SelectAChannelPrefix + ':{channel_id}'
 
     SetLangPrefix = 'sll'
     SetLang = SetLangPrefix + ':{langcode}'

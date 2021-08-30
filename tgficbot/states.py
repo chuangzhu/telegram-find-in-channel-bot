@@ -7,6 +7,7 @@ AddingAChannel = State(0xa31b2f1f)
 SelectingAChannelToFind = State(0x72db58bd)
 FindingInAChannel = State(0xfc757945)
 SettingLang = State(0xae60c307)
+SelectingAChannelToSetToken = State(0xb0e689be)
 
 
 def StateHandler(database):
