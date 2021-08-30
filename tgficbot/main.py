@@ -6,7 +6,6 @@ from telethon.tl.custom import Button
 from telethon.errors.rpcerrorlist import ChannelPrivateError
 
 import os
-import shlex
 import signal
 from pathlib import Path
 import logging
@@ -137,51 +136,6 @@ async def adding_forward_handler(event: NewMessage.Event, _):
     db.clear_user_state(user)
 
 
-# TODO: merge arged find and interactive find
-@bot.on(NewMessage(pattern=r'^/find +(.+)'))
-@onstate(states.Empty)
-@withi18n
-async def arged_find_command_handler(event: NewMessage.Event, _):
-    """Find a pattern in a channel using a CLI-like syntax"""
-    raw_args = event.pattern_match.group(1)
-    try:
-        args = shlex.split(raw_args)
-    except ValueError:
-        await event.respond(
-            _('Invalid command, use `/help find` for more information'))
-        return
-    channel_pattern = args[0]
-    pattern = ' '.join(args[1:])
-    user = await event.get_chat()
-
-    if channel_pattern.startswith('@'):
-        channel_id = db.get_channel_id_from_name(user,
-                                                 channel_pattern.lstrip('@'))
-        if not channel_id:
-            await event.respond(
-                _('No such channel: **{}**').format(channel_pattern))
-            return
-    else:
-        matched_ids = db.match_user_owned_channels_with_pattern(
-            user, channel_pattern)
-        if not len(matched_ids):
-            await event.respond(
-                _('No such channel: **{}**').format(channel_pattern))
-            return
-        if len(matched_ids) > 1:
-            await event.respond(
-                _('Multiple channels matched, finding in **{}**').format(
-                    db.get_channel_title(matched_ids[0])))
-        channel_id = matched_ids[0]
-
-    found_message_ids = db.find_in_messages(channel_id, pattern)
-    if not len(found_message_ids):
-        await event.respond('No results.')
-        return
-    for message_id in found_message_ids:
-        await bot.forward_messages(user, message_id, channel_id)
-
-
 def three_buttons_each_line(buttons: List[Button]) -> List[List[Button]]:
     res = []
     for i in range(0, len(buttons), 3):
@@ -207,7 +161,7 @@ async def channel_picker(event: NewMessage.Event, user: types.User, message: str
     await event.respond(message, buttons=buttons)
 
 
-@bot.on(NewMessage(pattern=r'^/find$'))
+@bot.on(NewMessage(pattern=r'/find'))
 @onstate(states.Empty)
 @withi18n
 async def find_command_handler(event: NewMessage.Event, _):
@@ -239,7 +193,7 @@ async def select_channel_to_find_handler(event: CallbackQuery.Event, _):
         return
     channel_id = int(data.split(':')[1])
 
-    if not db.is_channel_admins(user, channel_id):
+    if not db.is_channel_admin(user, channel_id):
         not_admin_message(event, user, _)
         return
 
@@ -445,7 +399,7 @@ async def select_channel_to_set_token_handler(event: CallbackQuery.Event, _):
         return
     channel_id = int(data.split(':')[1])
 
-    if not db.is_channel_admins(user, channel_id):
+    if not db.is_channel_admin(user, channel_id):
         not_admin_message(event, user, _)
         return
 

@@ -118,7 +118,7 @@ class Database:
         # Return ids only
         return first_fetchall(sqlresult)
 
-    def is_channel_admins(self, user: types.User, channel_id: int) -> bool:
+    def is_channel_admin(self, user: types.User, channel_id: int) -> bool:
         return user.id in self.get_channel_admins(channel_id)
 
     def get_channel_title(self, channel_id: int):
@@ -131,38 +131,6 @@ class Database:
             'SELECT username FROM channels WHERE channel_id = ?',
             (channel_id, ))
         return self.cursor.fetchone()[0]
-
-    def match_user_owned_channels_with_pattern(self, user: types.User,
-                                               pattern: str) -> List[int]:
-        sqlquery = """
-            SELECT channel_id FROM channels
-            WHERE channel_id IN (
-                SELECT channel_id FROM channels_admins WHERE user_id = ?
-            ) AND {0} LIKE ?
-            ORDER BY {0}
-        """
-        # Find in channels names, then channel titles. The priority matters.
-        self.cursor.execute(sqlquery.format('username'),
-                            (user.id, f'%{pattern}%'))
-        matched_ids = first_fetchall(self.cursor.fetchall())
-        self.cursor.execute(sqlquery.format('title'),
-                            (user.id, f'%{pattern}%'))
-        matched_ids += first_fetchall(self.cursor.fetchall())
-        # Remove duplicates
-        matched_ids = list(dict.fromkeys(matched_ids))
-        return matched_ids
-
-    def get_channel_id_from_name(self, user: types.User,
-                                 channel_name: str) -> int:
-        self.cursor.execute(
-            """
-            SELECT channel_id FROM channels
-            WHERE channel_id IN (
-                SELECT channel_id FROM channels_admins WHERE user_id = ?
-            ) AND username = ?
-        """, (user.id, channel_name))
-        sqlresult = self.cursor.fetchone()
-        return sqlresult and sqlresult[0]
 
     def save_message(self, message: types.Message):
         if not isinstance(message, types.Message):
