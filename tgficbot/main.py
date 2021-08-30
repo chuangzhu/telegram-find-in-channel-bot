@@ -47,17 +47,27 @@ bot = TelegramClient(
     config['api']['hash']).start(bot_token=config['bot']['token'])
 
 
-@bot.on(NewMessage(pattern='/start'))
+@bot.on(NewMessage(pattern=r'/start\s*(.*)'))
 @withi18n
 async def start_command_handler(event: NewMessage.Event, _):
     if not event.is_private:
         return
-    await event.respond(
-        _('Hi! To /find in your channel, you must /add it to this bot first.'))
     chat = await event.get_chat()
     db.save_user(chat)
     db.conn.commit()
-    raise StopPropagation
+    parameter = event.pattern_match.group(1).strip()
+
+    if parameter:
+        channel_title = db.start_searching_with_token(chat, parameter)
+        if channel_title is None:
+            await event.respond(_('This search token is invalid.'))
+            return
+        await event.respond(
+            _('Now type in what you want to find in **{}**, or /cancel to quit.').
+            format(channel_title))
+        raise StopPropagation
+    await event.respond(
+        _('Hi! To /find in your channel, you must /add it to this bot first.'))
 
 
 @bot.on(NewMessage(pattern='/add'))

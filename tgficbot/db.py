@@ -216,3 +216,14 @@ class Database:
             'UPDATE channels SET token=? WHERE channel_id=?',
             (token, channel_id, ))
         return token
+
+    def start_searching_with_token(self, user: types.User, token: str) -> str:
+        """Get channel_id with token, then start searching with id"""
+        self.cursor.execute('SELECT channel_id, title FROM channels WHERE token = ?',
+                            (token, ))
+        channel = self.cursor.fetchone()
+        if channel is None:
+            return None
+        self.set_user_selected(user.id, channel[0])
+        self.set_user_state(user, state=states.FindingInAChannel)
+        return channel[1]
