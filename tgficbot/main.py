@@ -264,8 +264,8 @@ async def finding_handler(event: NewMessage.Event, _):
     for i in range(constants.MessagesEachSearch):
         await bot.forward_messages(user, found_message_ids[i], channel_id)
     await event.respond(
-        _('Only {} results are shown, click the buttons below for more.'.
-          format(constants.MessagesEachSearch)),
+        _('Only {} results are shown, click the buttons below for more.').
+        format(constants.MessagesEachSearch),
         buttons=get_showmore_buttons(search=pattern,
                                      start=0,
                                      total=len(found_message_ids)),
@@ -296,8 +296,8 @@ async def finding_showmore_handler(event: CallbackQuery.Event, _):
     for i in range(id_start, id_end):
         await bot.forward_messages(user, found_message_ids[i], channel_id)
     await event.respond(
-        _('Only {} results are shown, click the buttons below for more.'.
-          format(constants.MessagesEachSearch)),
+        _('Only {} results are shown, click the buttons below for more.').
+        format(constants.MessagesEachSearch),
         buttons=get_showmore_buttons(search=pattern,
                                      start=id_start,
                                      total=len(found_message_ids)),
@@ -418,8 +418,8 @@ async def select_channel_to_set_token_handler(event: CallbackQuery.Event, _):
     token = db.set_channel_token(channel_id)
     db.clear_user_state(user)
     await event.respond(
-        _('Search token for channel **{}** has been set.\n' +
-          'Share this URL to allow others to search in your channel:\n\n' +
+        _('Search token for channel **{}** has been set.\n'
+          'Share this URL to allow others to search in your channel:\n\n'
           'https://t.me/{}?start={}').format(channel_title, me.username, token))
 
 
