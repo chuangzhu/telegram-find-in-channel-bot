@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-10-30 13:24+0800\n"
+"POT-Creation-Date: 2021-09-06 05:50+0800\n"
 "PO-Revision-Date: 2020-10-30 08:21+0800\n"
 "Last-Translator: Zhu Chuang <genelocated@yandex.com>\n"
 "Language-Team: English\n"
@@ -16,105 +16,101 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../main.py:57 ../main.py:290
-msgid "Hi! To /find in your channel, you must /add it to this bot first."
-msgstr "Hi! To /find in your channel, you must /add it to this bot first."
+#: ../main.py:63
+msgid "This search token is invalid."
+msgstr "This search token is invalid."
 
-#: ../main.py:69
-msgid ""
-"To add your channel, do the following:\n"
-"\n"
-"1. Add this bot to your channel as an admin;\n"
-"2. Forward a message from the channel to me."
-msgstr ""
-"To add your channel, do the following:\n"
-"\n"
-"1. Add this bot to your channel as an admin;\n"
-"2. Forward a message from the channel to me."
-
-#: ../main.py:86
-msgid "Aborted."
-msgstr "Aborted."
-
-#: ../main.py:97
-msgid ""
-"Please forward any message from your channel to me, or /cancel to abort."
-msgstr ""
-"Please forward any message from your channel to me, or /cancel to abort."
-
-#: ../main.py:101
-msgid "Please forward from a channel."
-msgstr "Please forward from a channel."
-
-#: ../main.py:104
-msgid "Getting channel infos..."
-msgstr "Getting channel infos..."
-
-#: ../main.py:109 ../main.py:115
-msgid ""
-"Please add this bot to your channel before you forward me channel messages."
-msgstr ""
-"Please add this bot to your channel before you forward me channel messages."
-
-#: ../main.py:119
-msgid "Channel already added. Abort."
-msgstr "Channel already added. Abort."
-
-#: ../main.py:130
-msgid "Obtaining previous messages..."
-msgstr "Obtaining previous messages..."
-
-#: ../main.py:136
-msgid "Add finished."
-msgstr "Add finished."
-
-#: ../main.py:150
-msgid "Invalid command, use `/help find` for more information"
-msgstr "Invalid command, use `/help find` for more information"
-
-#: ../main.py:161 ../main.py:168
-msgid "No such channel: **{}**"
-msgstr "No such channel: **{}**"
-
-#: ../main.py:172
-msgid "Multiple channels matched, finding in **{}**"
-msgstr "Multiple channels matched, finding in **{}**"
-
-#: ../main.py:191
-msgid "This command can only be used in private chat."
-msgstr "This command can only be used in private chat."
-
-#: ../main.py:199
-msgid ""
-"You haven't had any channel added to this bot. Please /add a channel first."
-msgstr ""
-"You haven't had any channel added to this bot. Please /add a channel first."
-
-#: ../main.py:208
-msgid "Select a channel to search:"
-msgstr "Select a channel to search:"
-
-#: ../main.py:221
-msgid "Sorry, you don't have the permission to access this channel."
-msgstr "Sorry, you don't have the permission to access this channel."
-
-#: ../main.py:229
+#: ../main.py:66 ../main.py:214
 msgid "Now type in what you want to find in **{}**, or /cancel to quit."
 msgstr "Now type in what you want to find in **{}**, or /cancel to quit."
 
-#: ../main.py:243
+#: ../main.py:70 ../main.py:356
+msgid "Hi! To /find in your channel, you must /add it to this bot first."
+msgstr "Hi! To /find in your channel, you must /add it to this bot first."
+
+#: ../main.py:78
+msgid ""
+"To add your channel, do the following:\n"
+"\n"
+"1. Add this bot to your channel as an admin;\n"
+"2. Forward a message from the channel to me."
+msgstr ""
+"To add your channel, do the following:\n"
+"\n"
+"1. Add this bot to your channel as an admin;\n"
+"2. Forward a message from the channel to me."
+
+#: ../main.py:95
+msgid "Aborted."
+msgstr "Aborted."
+
+#: ../main.py:106
+msgid ""
+"Please forward any message from your channel to me, or /cancel to abort."
+msgstr ""
+"Please forward any message from your channel to me, or /cancel to abort."
+
+#: ../main.py:110
+msgid "Please forward from a channel."
+msgstr "Please forward from a channel."
+
+#: ../main.py:113
+msgid "Getting channel infos..."
+msgstr "Getting channel infos..."
+
+#: ../main.py:118 ../main.py:124
+msgid ""
+"Please add this bot to your channel before you forward me channel messages."
+msgstr ""
+"Please add this bot to your channel before you forward me channel messages."
+
+#: ../main.py:128
+msgid "Channel already added. Abort."
+msgstr "Channel already added. Abort."
+
+#: ../main.py:139
+msgid "Obtaining previous messages..."
+msgstr "Obtaining previous messages..."
+
+#: ../main.py:145
+msgid "Add finished."
+msgstr "Add finished."
+
+#: ../main.py:166
+msgid ""
+"You haven't had any channel added to this bot. Please /add a channel first."
+msgstr ""
+"You haven't had any channel added to this bot. Please /add a channel first."
+
+#: ../main.py:180
+msgid "This command can only be used in private chat."
+msgstr "This command can only be used in private chat."
+
+#: ../main.py:185
+msgid "Select a channel to search:"
+msgstr "Select a channel to search:"
+
+#: ../main.py:192
+msgid "Sorry, you don't have the permission to access this channel."
+msgstr "Sorry, you don't have the permission to access this channel."
+
+#: ../main.py:255
 msgid "No results."
 msgstr "No results."
 
-#: ../main.py:267
+#: ../main.py:267 ../main.py:299
+msgid "Only {} results are shown, click the buttons below for more."
+msgstr "Only {} results are shown, click the buttons below for more."
+
+#: ../main.py:333
 msgid "Follow Telegram settings"
 msgstr "Follow Telegram settings"
 
-#: ../main.py:274
+#: ../main.py:337
 msgid "Select your language:"
 msgstr "Select your language:"
 
-#: ../main.py:304
+#: ../main.py:370
 msgid ""
 "/add - Add a channel to the bot\n"
 "/find - Find in a channel\n"
@@ -130,7 +126,7 @@ msgstr ""
 "\n"
 "Use `/help [command]` to view help about a specific command."
 
-#: ../main.py:314
+#: ../main.py:380
 msgid ""
 "**Usage**:\n"
 "    `/add`\n"
@@ -142,7 +138,7 @@ msgstr ""
 "\n"
 "Add a channel to the bot"
 
-#: ../main.py:316
+#: ../main.py:382
 msgid ""
 "**Usage**:\n"
 "    `/find`\n"
@@ -154,7 +150,7 @@ msgstr ""
 "\n"
 "Find in a channel"
 
-#: ../main.py:319
+#: ../main.py:385
 msgid ""
 "**Usage**:\n"
 "    `/cancel`\n"
@@ -166,7 +162,7 @@ msgstr ""
 "\n"
 "Cancel or quit current operation"
 
-#: ../main.py:321
+#: ../main.py:387
 msgid ""
 "**Usage**:\n"
 "    `/lang`\n"
@@ -178,6 +174,32 @@ msgstr ""
 "\n"
 "Set bot language"
 
-#: ../main.py:323
+#: ../main.py:389
 msgid "Command not found: `/{}`"
 msgstr "Command not found: `/{}`"
+
+#: ../main.py:397
+msgid "Select a channel to set search token:"
+msgstr "Select a channel to set search token:"
+
+#: ../main.py:421
+msgid ""
+"Search token for channel **{}** has been set.\n"
+"Share this URL to allow others to search in your channel:\n"
+"\n"
+"https://t.me/{}?start={}"
+msgstr ""
+"Search token for channel **{}** has been set.\n"
+"Share this URL to allow others to search in your channel:\n"
+"\n"
+"https://t.me/{}?start={}"
+
+
+#~ msgid "Invalid command, use `/help find` for more information"
+#~ msgstr "Invalid command, use `/help find` for more information"
+
+#~ msgid "No such channel: **{}**"
+#~ msgstr "No such channel: **{}**"
+
+#~ msgid "Multiple channels matched, finding in **{}**"
+#~ msgstr "Multiple channels matched, finding in **{}**"

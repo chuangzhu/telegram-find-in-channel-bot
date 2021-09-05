@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-10-30 13:24+0800\n"
+"POT-Creation-Date: 2021-09-06 05:50+0800\n"
 "PO-Revision-Date: 2020-10-30 06:32+0800\n"
 "Last-Translator: Zhu Chuang <genelocated@yandex.com>\n"
 "Language-Team: Language zh-hans\n"
@@ -15,13 +15,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 
-#: ../main.py:57 ../main.py:290
+#: ../main.py:63
+msgid "This search token is invalid."
+msgstr "无效的搜索令牌。"
+
+#: ../main.py:66 ../main.py:214
+msgid "Now type in what you want to find in **{}**, or /cancel to quit."
+msgstr "请输入你要搜索的内容，或使用 /cancel 退出。"
+
+#: ../main.py:70 ../main.py:356
 msgid "Hi! To /find in your channel, you must /add it to this bot first."
 msgstr ""
 "你好！请先使用 /add 命令将你的频道添加至这个机器人，然后就可以使用 /find 进行"
 "搜索啦。"
 
-#: ../main.py:69
+#: ../main.py:78
 msgid ""
 "To add your channel, do the following:\n"
 "\n"
@@ -33,86 +41,74 @@ msgstr ""
 "1. 将这个机器人作为管理员添加至你的频道；\n"
 "2. 将你的频道中的一条信息转发给我。"
 
-#: ../main.py:86
+#: ../main.py:95
 msgid "Aborted."
 msgstr "已取消。"
 
-#: ../main.py:97
+#: ../main.py:106
 msgid ""
 "Please forward any message from your channel to me, or /cancel to abort."
 msgstr "请将你的频道中任意一条消息转发给我，或使用 /cancel 来取消。"
 
-#: ../main.py:101
+#: ../main.py:110
 msgid "Please forward from a channel."
 msgstr "请从一个频道转发。"
 
-#: ../main.py:104
+#: ../main.py:113
 msgid "Getting channel infos..."
 msgstr "正在获取频道信息..."
 
-#: ../main.py:109 ../main.py:115
+#: ../main.py:118 ../main.py:124
 msgid ""
 "Please add this bot to your channel before you forward me channel messages."
 msgstr "请先完成第一步：将机器人添加至你的频道。"
 
-#: ../main.py:119
+#: ../main.py:128
 msgid "Channel already added. Abort."
 msgstr "频道已添加。"
 
-#: ../main.py:130
+#: ../main.py:139
 msgid "Obtaining previous messages..."
 msgstr "正在获取以往的频道消息..."
 
-#: ../main.py:136
+#: ../main.py:145
 msgid "Add finished."
 msgstr "频道已添加。"
 
-#: ../main.py:150
-msgid "Invalid command, use `/help find` for more information"
-msgstr ""
-
-#: ../main.py:161 ../main.py:168
-msgid "No such channel: **{}**"
-msgstr ""
-
-#: ../main.py:172
-msgid "Multiple channels matched, finding in **{}**"
-msgstr ""
-
-#: ../main.py:191
-msgid "This command can only be used in private chat."
-msgstr "该命令只能在与机器人私聊时使用。"
-
-#: ../main.py:199
+#: ../main.py:166
 msgid ""
 "You haven't had any channel added to this bot. Please /add a channel first."
 msgstr "你还没有将任何频道添加至这个机器人，快使用 /add 添加一个吧。"
 
-#: ../main.py:208
+#: ../main.py:180
+msgid "This command can only be used in private chat."
+msgstr "该命令只能在与机器人私聊时使用。"
+
+#: ../main.py:185
 msgid "Select a channel to search:"
 msgstr "选择一个频道："
 
-#: ../main.py:221
+#: ../main.py:192
 msgid "Sorry, you don't have the permission to access this channel."
 msgstr "很抱歉，你没有权限访问此频道。"
 
-#: ../main.py:229
-msgid "Now type in what you want to find in **{}**, or /cancel to quit."
-msgstr "请输入你要搜索的内容，或使用 /cancel 退出。"
-
-#: ../main.py:243
+#: ../main.py:255
 msgid "No results."
 msgstr "未找到结果。"
 
-#: ../main.py:267
+#: ../main.py:267 ../main.py:299
+msgid "Only {} results are shown, click the buttons below for more."
+msgstr "仅显示了 {} 条搜索结果，点击下方的按钮查看更多。"
+
+#: ../main.py:333
 msgid "Follow Telegram settings"
 msgstr "跟随 Telegram 设置"
 
-#: ../main.py:274
+#: ../main.py:337
 msgid "Select your language:"
 msgstr "选择你的语言："
 
-#: ../main.py:304
+#: ../main.py:370
 msgid ""
 "/add - Add a channel to the bot\n"
 "/find - Find in a channel\n"
@@ -128,7 +124,7 @@ msgstr ""
 "\n"
 "使用 `/help [命令]` 以查看某个具体命令的帮助。"
 
-#: ../main.py:314
+#: ../main.py:380
 msgid ""
 "**Usage**:\n"
 "    `/add`\n"
@@ -140,7 +136,7 @@ msgstr ""
 "\n"
 "添加一个频道"
 
-#: ../main.py:316
+#: ../main.py:382
 msgid ""
 "**Usage**:\n"
 "    `/find`\n"
@@ -152,7 +148,7 @@ msgstr ""
 "\n"
 "在一个频道中搜索"
 
-#: ../main.py:319
+#: ../main.py:385
 msgid ""
 "**Usage**:\n"
 "    `/cancel`\n"
@@ -164,7 +160,7 @@ msgstr ""
 "\n"
 "取消当前操作"
 
-#: ../main.py:321
+#: ../main.py:387
 msgid ""
 "**Usage**:\n"
 "    `/lang`\n"
@@ -176,6 +172,21 @@ msgstr ""
 "\n"
 "设置机器人的界面语言"
 
-#: ../main.py:323
+#: ../main.py:389
 msgid "Command not found: `/{}`"
 msgstr "`/{}` 命令不存在"
+
+#: ../main.py:397
+msgid "Select a channel to set search token:"
+msgstr "选择要设置搜索令牌的频道："
+
+#: ../main.py:421
+msgid ""
+"Search token for channel **{}** has been set.\n"
+"Share this URL to allow others to search in your channel:\n"
+"\n"
+"https://t.me/{}?start={}"
+msgstr ""
+"頻道 **{}** 的搜索令牌已設置。分享下方鏈接以允許其他人在該頻道內搜索。\n"
+"\n"
+"https://t.me/{}?start={}"
