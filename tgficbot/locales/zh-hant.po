@@ -1,11 +1,11 @@
 # Language zh-hant translations for PACKAGE package.
-# Copyright (C) 2020 ORGANIZATION
-# Zhu Chuang <genelocated@yandex.com>, 2020.
+# Copyright (C) 2020-2021 ORGANIZATION
+# Zhu Chuang <genelocated@yandex.com>, 2020-2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2021-09-06 05:50+0800\n"
+"POT-Creation-Date: 2021-09-06 08:53+0800\n"
 "PO-Revision-Date: 2020-10-30 07:00+0800\n"
 "Last-Translator: Zhu Chuang <genelocated@yandex.com>\n"
 "Language-Team: Language zh-hant\n"
@@ -108,78 +108,25 @@ msgstr "跟隨 Telegram 設置"
 msgid "Select your language:"
 msgstr "選擇你的語言："
 
-#: ../main.py:370
+#: ../main.py:367
 msgid ""
 "/add - Add a channel to the bot\n"
 "/find - Find in a channel\n"
 "/cancel - Cancel or quit current operation\n"
-"/lang - Set bot language\n"
-"\n"
-"Use `/help [command]` to view help about a specific command."
+"/setlang - Set bot language\n"
+"/settoken - Create a token for non-admins to search"
 msgstr ""
 "/add - 添加一個頻道\n"
 "/find - 在一個頻道中搜索\n"
 "/cancel - 取消當前操作\n"
-"/lang - 設置機器人的界面語言\n"
-"使用 `/help [命令]` 以查看某個具體命令的幫助。"
+"/setlang - 設置機器人的界面語言\n"
+"/settoken - 創建一個可供非管理員搜索的令牌"
 
-#: ../main.py:380
-msgid ""
-"**Usage**:\n"
-"    `/add`\n"
-"\n"
-"Add a channel to the bot"
-msgstr ""
-"**用法**：\n"
-"`    /add`\n"
-"\n"
-"添加一個頻道"
-
-#: ../main.py:382
-msgid ""
-"**Usage**:\n"
-"    `/find`\n"
-"\n"
-"Find in a channel"
-msgstr ""
-"**用法**：\n"
-"    `/find`\n"
-"\n"
-"在一個頻道中搜索"
-
-#: ../main.py:385
-msgid ""
-"**Usage**:\n"
-"    `/cancel`\n"
-"\n"
-"Cancel or quit current operation"
-msgstr ""
-"**用法**：\n"
-"    `/cancel`\n"
-"\n"
-"取消當前操作"
-
-#: ../main.py:387
-msgid ""
-"**Usage**:\n"
-"    `/lang`\n"
-"\n"
-"Set bot language"
-msgstr ""
-"**用法**：\n"
-"    `/lang`\n"
-"\n"
-"設置機器人的界面語言"
-
-#: ../main.py:389
-msgid "Command not found: `/{}`"
-msgstr "`/{}` 命令不存在"
-
-#: ../main.py:397
+#: ../main.py:379
 msgid "Select a channel to set search token:"
 msgstr "選擇要設置搜索令牌的頻道："
 
-#: ../main.py:421
+#: ../main.py:403
 msgid ""
 "Search token for channel **{}** has been set.\n"
 "Share this URL to allow others to search in your channel:\n"
@@ -189,3 +136,4 @@ msgstr ""
 "頻道 **{}** 的搜索令牌已設置。分享下方鏈接以允許其他人在該頻道內搜索。\n"
 "\n"
 "https://t.me/{}?start={}"
+

@@ -317,7 +317,7 @@ async def channel_messageedited_handler(event: MessageEdited.Event):
         db.update_message(event.message)
 
 
-@bot.on(NewMessage(pattern='/lang'))
+@bot.on(NewMessage(pattern='/setlang'))
 @onstate(states.Empty)
 @withi18n
 async def lang_command_handler(event: NewMessage.Event, _):
@@ -359,34 +359,16 @@ async def setting_lang_handler(event: CallbackQuery.Event):
     await withi18n(respond)(event)
 
 
-@bot.on(NewMessage(pattern=r'/help ?(\w*)'))
+@bot.on(NewMessage(pattern=r'/help'))
 @onstate(states.Empty)
 @withi18n
 async def help_command_handler(event: NewMessage.Event, _):
-    # May be the specific command or ''
-    command = event.pattern_match.group(1)
-    if not command:
-        await event.respond(
-            _('/add - Add a channel to the bot\n'
-              '/find - Find in a channel\n'
-              '/cancel - Cancel or quit current operation\n'
-              '/lang - Set bot language\n'
-              '\n'
-              'Use `/help [command]` to view help about a specific command.'))
-        return
-
-    if command == 'add':
-        await event.respond(
-            _('**Usage**:\n    `/add`\n\nAdd a channel to the bot'))
-    elif command == 'find':
-        await event.respond(_('**Usage**:\n    `/find`\n\nFind in a channel'))
-    elif command == 'cancel':
-        await event.respond(
-            _('**Usage**:\n    `/cancel`\n\nCancel or quit current operation'))
-    elif command == 'lang':
-        await event.respond(_('**Usage**:\n    `/lang`\n\nSet bot language'))
-    else:
-        await event.respond(_('Command not found: `/{}`').format(command))
+    await event.respond(
+        _('/add - Add a channel to the bot\n'
+          '/find - Find in a channel\n'
+          '/cancel - Cancel or quit current operation\n'
+          '/setlang - Set bot language\n'
+          '/settoken - Create a token for non-admins to search'))
 
 
 @bot.on(NewMessage(pattern=r'/settoken'))

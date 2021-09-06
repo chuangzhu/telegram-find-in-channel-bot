@@ -9,7 +9,8 @@ The ‘Find in Conversations’ feature in Telegram does not support searching i
 `/start` the bot  
 `/add` a channel to the bot  
 `/find` in the channel  
-`/lang` setting UI language  
+`/setlang` setting UI language  
+`/settoken` create a token for others (non-admins) to search  
 `/cancel` the current action  
 `/help` show help
 
