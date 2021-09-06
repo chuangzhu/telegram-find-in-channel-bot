@@ -159,16 +159,18 @@ def channel_id2button(channel_id: int):
     return Button.inline(channel_title, data=data)
 
 
-async def channel_picker(event: NewMessage.Event, user: types.User, message: str, _):
+async def channel_picker(event: NewMessage.Event, user: types.User, message: str, _) -> bool:
+    """False: no channel added"""
     user_owned_channel_ids = db.get_user_owned_channels(user)
     if len(user_owned_channel_ids) == 0:
         await event.respond(
             _("You haven't had any channel added to this bot. Please /add a channel first."
               ))
-        return
+        return False
     buttons = list(map(channel_id2button, user_owned_channel_ids))
     buttons = three_buttons_each_line(buttons)
     await event.respond(message, buttons=buttons)
+    return True
 
 
 @bot.on(NewMessage(pattern=r'/find'))
@@ -183,8 +185,8 @@ async def find_command_handler(event: NewMessage.Event, _):
 
     user = await event.get_chat()
     message_text = _('Select a channel to search:')
-    await channel_picker(event, user, message_text, _)
-    db.set_user_state(user, states.SelectingAChannelToFind)
+    if await channel_picker(event, user, message_text, _):
+        db.set_user_state(user, states.SelectingAChannelToFind)
 
 
 async def not_admin_message(event, user, _):
@@ -377,8 +379,8 @@ async def help_command_handler(event: NewMessage.Event, _):
 async def settoken_command_handler(event: NewMessage.Event, _):
     user = await event.get_chat()
     message_text = _('Select a channel to set search token:')
-    await channel_picker(event, user, message_text, _)
-    db.set_user_state(user, states.SelectingAChannelToSetToken)
+    if await channel_picker(event, user, message_text, _):
+        db.set_user_state(user, states.SelectingAChannelToSetToken)
 
 
 @bot.on(CallbackQuery())
