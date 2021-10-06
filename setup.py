@@ -7,7 +7,7 @@ with open(path.join(here, 'README.md')) as f:
 
 setup(
     name='telegram-find-in-channel-bot',
-    version='0.5.0',
+    version='0.5.2',
     url='https://github.com/chuangzhu/telegram-find-in-channel-bot',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -15,7 +15,7 @@ setup(
     author_email='genelocated@yandex.com',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=['telethon==1.21.1'],
+    install_requires=['telethon>=1.17.0<1.24.0'],
     python_requires='>=3.7',  # We used some f-strings here
     entry_points={
         'console_scripts':
